@@ -14,6 +14,7 @@ void ASCIITextHeader() {
 	console_color = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(console_color, 10);
 	std::cout << "Hello, Welcome to CSOPESY commandline!" << std::endl;
+	SetConsoleTextAttribute(console_color, 14);
 	std::cout << "Type 'exit' to quit, 'clear' to clear the screen\n";
 	SetConsoleTextAttribute(console_color, 15);
 
@@ -43,8 +44,7 @@ int commandRecognize(std::string command) {
 		return 0;
 	}
 	else if (command == "exit") {
-		std::cout << "Exiting the application.\n";
-        return 0;
+        exit(0);
 	}
 	else {
 		std::cout << "Command not recognized. \n";

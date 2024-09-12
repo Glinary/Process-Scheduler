@@ -18,14 +18,14 @@ using namespace std;
 
 int main()
 {
-	// HANDLE console_color;
+	HANDLE console_color;
 	std::string command;
 
 	ASCIITextHeader();
 	std::cout << "";
 
 	console_color = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(console_color, 14);
+	SetConsoleTextAttribute(console_color, 15);
 		std::cout << "Enter a command: ";
 
 	std::cin >> command;
