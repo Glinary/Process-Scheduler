@@ -40,8 +40,8 @@ int commandRecognize(std::string command) {
 		return 0;
 	}
 	else if (command == "exit") {
-		/*close the CLI*/
-		exit(0);
+		std::cout << "Exiting the application.\n";
+        break;
 	}
 	else {
 		std::cout << "Command not recognized. \n";
