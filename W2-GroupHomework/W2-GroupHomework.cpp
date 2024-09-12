@@ -18,7 +18,7 @@ using namespace std;
 
 int main()
 {
-	HANDLE console_color;
+	// HANDLE console_color;
 	std::string command;
 
 	ASCIITextHeader();
@@ -26,9 +26,8 @@ int main()
 
 	console_color = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(console_color, 14);
-	std::cout << "Type 'exit' to quit, 'clear' to clear the screen\n";
-	SetConsoleTextAttribute(console_color, 15);
-	std::cout << "Enter a command: ";
+		std::cout << "Enter a command: ";
+
 	std::cin >> command;
 
 	while (true) {
@@ -38,7 +37,7 @@ int main()
 		else {
 			std::cout << "Command not recognized. \n";
 		}
-		std::cout << "\n";
+		// std::cout << "\n";
 		std::cout << "Enter a command: ";
 		std::cin >> command;
 	}
