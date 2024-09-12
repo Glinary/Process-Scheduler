@@ -12,6 +12,7 @@
 1. Install Xcode Command Line Tools `xcode-select --install`.
 1. Open a terminal on the same directory `W2-GroupHomework`.
 1. Type the command `g++ W2-GroupHomework.cpp allfunctions.cpp -o processScheduler`.
+1. Type the command `./processScheduler`.
 1. Wait for the Terminal to start running. 
 
 # App Features
