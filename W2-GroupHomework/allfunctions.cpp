@@ -27,23 +27,23 @@ bool isCommandValid(std::string command) {
 
 int commandRecognize(std::string command) {
 	if (command == "initialize") {
-		std::cout << "initialize command recognized. Doing something.\n";
+		std::cout << command << " command recognized. Doing something.\n";
 		return 0;
 	}
 	else if (command == "screen") {
-		std::cout << "screen command recognized. Doing something.\n";
+		std::cout << command << " command recognized. Doing something.\n";
 		return 0;
 	}
 	else if (command == "scheduler-test") {
-		std::cout << "scheduler-test command recognized. Doing something.\n";
+		std::cout << command << " command recognized. Doing something.\n";
 		return 0;
 	}
 	else if (command == "scheduler-stop") {
-		std::cout << "scheduler-stop command recognized. Doing something.\n";
+		std::cout << command << " command recognized. Doing something.\n";
 		return 0;
 	}
 	else if (command == "report-util") {
-		std::cout << "report-util command recognized. Doing something.\n";
+		std::cout << command << " command recognized. Doing something.\n";
 		return 0;
 	}
 	else if (command == "clear") {
