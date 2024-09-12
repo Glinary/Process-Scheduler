@@ -35,8 +35,9 @@ int commandRecognize(std::string command) {
 			return 0;
 	}
 	else if (command == "clear") {
-		system("CLS");
-		return 1;
+		system("cls");
+		ASCIITextHeader();
+		return 0;
 	}
 	else if (command == "exit") {
 		/*close the CLI*/
