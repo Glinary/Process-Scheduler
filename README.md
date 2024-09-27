@@ -4,7 +4,7 @@
 # How to compile & run the program on Windows
 1. Ensure that you have [MinGW](https://sourceforge.net/projects/mingw/) installed for Windows users
 1. Open a terminal on the same directory `W2-GroupHomework`
-1. Type the command `gcc W2-GroupHomework.cpp allfunctions.cpp -o processScheduler.exe`
+1. Type the command `g++ W2-GroupHomework.cpp allfunctions.cpp -o processScheduler.exe`
 1. Type the command `./processScheduler.exe`
 1. Wait for the Command Line Interface (CLI) to start running
 
