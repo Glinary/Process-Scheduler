@@ -32,58 +32,65 @@ int main(void) {
         //get user input to select command
         getCommand(&command);
         parsedCommand = parseCommand(command);
-         std::cout << command << std::endl;
+        // std::cout << command << std::endl;
 
         if (parsedCommand[0]== "quit") {
 
             return 0;
 
-        } else if (parsedCommand[0] == "screen-s") {
+        } else if (parsedCommand[0] == "screen") {
 
-            if (parsedCommand.size() < 2) { // Ensure there is process name
-            continue;
-            }
-
-            //Initialize new session class in a vector
-
-            //Get current timestamp
-            std::time_t currentTime = std::time(nullptr);
-            std::string processName = parsedCommand[1];
-            ScreenSession screenSession(processName, currentTime);
-            sessions.push_back(ScreenSession (processName, currentTime));
-
-            //Use the newly initialized session class
-            sessions.back().viewSession();
-            waitForExit();
-            displayMenu();
-            clearNewline();
+            if (parsedCommand[1] == "-s") {
+                std::cout << command << std::endl;
             
-        } else if (parsedCommand[0] == "screen-ls") {
 
-            displayActiveSessions();
-            waitForExit();
-            displayMenu();
-            clearNewline();
-
-        //TODO: replace this with multiple word strings e.g. "screen -r <name>"
-        } else if (command == "screen-r<name>") {
-
-            //TODO: if <name> does not exist, skip this section and user should be informed
-
-            std::string processName;
-            std::string dumpName = "test1"; //TODO: REPLACE THIS WITH PROPER VARIABLE
-
-            for (ScreenSession &session : sessions) {
-                processName = session.getProcessName();
-                if (processName == dumpName) {
-                    session.viewSession();
-                    break;
+                if (parsedCommand.size() < 3) { // Ensure there is process name
+                    continue;
                 }
-            }
-            waitForExit();
-            displayMenu();
-            clearNewline();
 
+                //Initialize new session class in a vector
+
+                //Get current timestamp
+                std::time_t currentTime = std::time(nullptr);
+                std::string processName = parsedCommand[2];
+                ScreenSession screenSession(processName, currentTime);
+                sessions.push_back(ScreenSession (processName, currentTime));
+
+                //Use the newly initialized session class
+                sessions.back().viewSession();
+                waitForExit();
+                displayMenu();
+                clearNewline();
+
+            }  else if (parsedCommand[1] == "-ls") {
+
+                displayActiveSessions();
+                waitForExit();
+                displayMenu();
+                clearNewline();
+            
+                //TODO: replace this with multiple word strings e.g. "screen -r <name>"
+            } else if (command == "screen-r<name>") {
+
+                //TODO: if <name> does not exist, skip this section and user should be informed
+
+                std::string processName;
+                std::string dumpName = "test1"; //TODO: REPLACE THIS WITH PROPER VARIABLE
+
+                for (ScreenSession &session : sessions) {
+                    processName = session.getProcessName();
+                    if (processName == dumpName) {
+                        session.viewSession();
+                        break;
+                    }
+                }
+                waitForExit();
+                displayMenu();
+                clearNewline();
+            } else {
+                std::cout << "I do not understand";
+                clearNewline();
+            }
         } else {
             std::cout << "I do not understand";
             clearNewline();
@@ -117,7 +124,7 @@ std::vector<std::string> parseCommand(const std::string& command) {
     std::vector<std::string> words;
     std::string word;
 
-    while (iss >> word && words.size() < 2) {
+    while (iss >> word && words.size() < 3) {
         words.push_back(word);  // Add only the first two words
     }
 
