@@ -2,6 +2,8 @@
 #include <ctime>
 #include <string>
 #include <vector>
+#include <sstream> 
+#include <iostream>
 
 /********** PROTOTYPE FUNCTIONS **********/
 void displayMenu(); 
@@ -9,6 +11,8 @@ void displayActiveSessions();
 void getCommand(std::string *command);
 bool checkCommandValidity(std::string &input);
 void waitForExit();
+std::vector<std::string> parseCommand(const std::string& command);
+void clearNewline();
 /********** PROTOTYPE FUNCTIONS **********/
 
 std::vector<ScreenSession> sessions;
@@ -23,22 +27,28 @@ int main(void) {
         //variables
         std::string command;
         bool commandIsValid;
+        std::vector<std::string> parsedCommand;
 
         //get user input to select command
         getCommand(&command);
+        parsedCommand = parseCommand(command);
+         std::cout << command << std::endl;
 
-        if (command == "quit") {
+        if (parsedCommand[0]== "quit") {
 
             return 0;
 
-        //TODO: replace this with multiple word strings e.g. "screen -s <name>"
-        } else if (command == "screen-s<name>") {
+        } else if (parsedCommand[0] == "screen-s") {
+
+            if (parsedCommand.size() < 2) { // Ensure there is process name
+            continue;
+            }
 
             //Initialize new session class in a vector
 
             //Get current timestamp
             std::time_t currentTime = std::time(nullptr);
-            std::string processName = "test1";
+            std::string processName = parsedCommand[1];
             ScreenSession screenSession(processName, currentTime);
             sessions.push_back(ScreenSession (processName, currentTime));
 
@@ -46,13 +56,14 @@ int main(void) {
             sessions.back().viewSession();
             waitForExit();
             displayMenu();
-
-        //TODO: replace this with multiple word strings e.g. "screen -ls"
-        } else if (command == "screen-ls") {
+            clearNewline();
+            
+        } else if (parsedCommand[0] == "screen-ls") {
 
             displayActiveSessions();
             waitForExit();
             displayMenu();
+            clearNewline();
 
         //TODO: replace this with multiple word strings e.g. "screen -r <name>"
         } else if (command == "screen-r<name>") {
@@ -71,9 +82,11 @@ int main(void) {
             }
             waitForExit();
             displayMenu();
+            clearNewline();
 
         } else {
             std::cout << "I do not understand";
+            clearNewline();
         }
 
         
@@ -89,7 +102,7 @@ int main(void) {
 /********** SHOW MAIN MENU **********/ 
 void displayMenu() {
     std::cout << "Main Menu" << std::endl;
-    std::cout << "command:" << "          "<< "description" << std::endl; 
+    std::cout << "command:" << "                 "<< "description" << std::endl; 
     //TODO: update the command names to have spaces once spaced version is working
     std::cout << "screen-s<name> " << "          " << "creates a new screen session" << std::endl;
     std::cout << "screen-ls" << "          " << "displays all active screen sessions" << std::endl;
@@ -97,6 +110,19 @@ void displayMenu() {
     std::cout << "quit " << "          " << "quit program" << std::endl;
 }
 /********** SHOW MAIN MENU **********/ 
+
+
+std::vector<std::string> parseCommand(const std::string& command) {
+    std::istringstream iss(command);
+    std::vector<std::string> words;
+    std::string word;
+
+    while (iss >> word && words.size() < 2) {
+        words.push_back(word);  // Add only the first two words
+    }
+
+    return words; // vector with 2 words
+}
 
 void displayActiveSessions() {
     system("cls");
@@ -109,8 +135,7 @@ void displayActiveSessions() {
 }
 
 void getCommand(std::string *command) {
-    std::cout << "" << std::endl;
-    std::cin >> *command;
+    std::getline(std::cin, *command);
 }
 
 void waitForExit() {
@@ -125,6 +150,12 @@ void waitForExit() {
     }
     system("cls");
     
+}
+
+void clearNewline(){
+    // Ignore the leftover newline character
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
 }
 
 bool checkCommandValidity(std::string &input) {
