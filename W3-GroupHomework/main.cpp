@@ -15,6 +15,7 @@ void getCommand(std::string* command);
 bool checkCommandValidity(std::string& input);
 void waitForExit();
 std::vector<std::string> parseCommand(const std::string& command);
+void clearNewline();
 /********** PROTOTYPE FUNCTIONS **********/
 
 std::vector<ScreenSession> sessions;
@@ -137,6 +138,11 @@ int main(void) {
             else {
                 std::cout << "Unknown command: " << parsedCommand[0] << ". I do not understand.\n";
             }
+            clearNewline();
+        }
+        else
+        {
+			std::cout << "Unknown command: " << parsedCommand[0] << ". I do not understand.\n";
         }
     }
 }
@@ -202,6 +208,12 @@ void waitForExit() {
 
 }
 
+
+void clearNewline() {
+    // Ignore the leftover newline character
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+}
 
 bool checkCommandValidity(std::string& input) {
     bool isValid = false;
