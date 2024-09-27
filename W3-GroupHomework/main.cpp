@@ -135,7 +135,9 @@ int main(void) {
 
 /********** SHOW MAIN MENU **********/ 
 void displayMenu() {
+    std::cout << "\n";
     std::cout << "Main Menu" << std::endl;
+    std::cout << "\n";
     std::cout << std::left << std::setw(20) << "command:" << "description" << std::endl;
     std::cout << std::left << std::setw(20) << "screen-s<name>" << "creates a new screen session" << std::endl;
     std::cout << std::left << std::setw(20) << "screen-ls" << "displays all active screen sessions" << std::endl;
