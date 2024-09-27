@@ -15,6 +15,7 @@ bool checkCommandValidity(std::string &input);
 void waitForExit();
 std::vector<std::string> parseCommand(const std::string& command);
 void clearNewline();
+std::string getFormattedTime();
 /********** PROTOTYPE FUNCTIONS **********/
 
 std::vector<ScreenSession> sessions;
@@ -36,53 +37,94 @@ int main(void) {
         parsedCommand = parseCommand(command);
         // std::cout << command << std::endl;
 
-        if (command.substr(0, 9) == "screen -s") {
-            //Get current timestamp
-            std::time_t currentTime = std::time(nullptr);
-            std::string processName = command.substr(10);
-            ScreenSession screenSession(processName, currentTime);
-            sessions.push_back(ScreenSession(processName, currentTime));
-
-            //Use the newly initialized session class
-            sessions.back().viewSession();
-            waitForExit();
-            displayMenu();
-        }
-        else if (command.substr(0, 9) == "screen -r") {
-            std::string processName = command.substr(10);
-            bool sessionFound = false;
-
-            for (ScreenSession& session : sessions) {
-                if (session.getProcessName() == processName) {
-                    session.viewSession();
-                    sessionFound = true;
-                    break;
-                }
-            }
-
-            if (!sessionFound) {
-                std::cout << "\n";
-                std::cout << "Error: Session with name '" << processName << "' does not exist." << std::endl;
-                std::cout << "Please type 'exit' to go back to the menu." << std::endl;
-                std::cout << "\n";
-            }
-        }
-        else if (command.substr(0, 9) == "ls") {
-
-            displayActiveSessions();
-            waitForExit();
-            displayMenu();
-        }
-        else if (command == "quit") {
+        if (parsedCommand[0]== "quit") {
 
             return 0;
 
+        } else if (parsedCommand[0] == "screen") {
+
+            if (parsedCommand[1] == "-s") {
+                std::cout << command << std::endl;
+            
+                if (parsedCommand.size() < 3) { // Ensure there is process name
+                    continue;
+                }
+
+                //Initialize new session class in a vector
+
+                //Get current timestamp
+                std::time_t currentTime = std::time(nullptr);
+                std::string formattedTime = getFormattedTime();
+                std::string processName = parsedCommand[2];
+                // ScreenSession screenSession(processName, currentTime);
+                sessions.push_back(ScreenSession (processName, formattedTime));
+
+                //Use the newly initialized session class
+                sessions.back().viewSession();
+                waitForExit();
+                displayMenu();
+
+            }  else if (parsedCommand[1] == "-ls") {
+
+                displayActiveSessions();
+                waitForExit();
+                displayMenu();
+            
+            } else if (parsedCommand[0] == "screen" && parsedCommand[1] == "-r") {
+
+                // if <name> does not exist, skip this section and user should be informed
+
+                // //
+                // std::string processName;
+                // std::string dumpName = "test1"; //TODO: REPLACE THIS WITH PROPER VARIABLE
+
+                // for (ScreenSession &session : sessions) {
+                //     processName = session.getProcessName();
+                //     if (processName == dumpName) {
+                //         session.viewSession();
+                //         break;
+                //     }
+                // }
+                // //
+
+                if (parsedCommand.size() < 3) {
+                    std::cout << "\n";
+                    std::cout << "Error: No process name provided." << std::endl;
+                    std::cout << "Please type 'exit' to go back to the menu." << std::endl;
+                    std::cout << "\n";
+                } else {
+                    std::string processName = parsedCommand[2];
+                    bool sessionFound = false;
+
+                    for (ScreenSession &session : sessions) {
+                        if (session.getProcessName() == processName) {
+                            session.viewSession();
+                            sessionFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!sessionFound) {
+                        std::cout << "\n";
+                        std::cout << "Error: Session with name '" << processName << "' does not exist." << std::endl;
+                        std::cout << "Please type 'exit' to go back to the menu." << std::endl;
+                        std::cout << "\n";
+                    }
+                }
+
+                waitForExit();
+                displayMenu();
+            } else {
+                std::cout << "I do not understand" << std::endl;
+            }
+        } else {
+            std::cout << "I do not understand" << std::endl;
         }
-        else {
-            std::cout << "I do not understand";
-        }
+
         clearNewline();
     }
+
+        
 }
 /********** CONTROLLER **********/
 
@@ -93,8 +135,8 @@ void displayMenu() {
     std::cout << "Main Menu" << std::endl;
     std::cout << "\n";
     std::cout << std::left << std::setw(20) << "command:" << "description" << std::endl;
-    std::cout << std::left << std::setw(20) << "screen-s<name>" << "creates a new screen session" << std::endl;
-    std::cout << std::left << std::setw(20) << "screen-ls" << "displays all active screen sessions" << std::endl;
+    std::cout << std::left << std::setw(20) << "screen -s <name>" << "creates a new screen session" << std::endl;
+    std::cout << std::left << std::setw(20) << "screen -ls" << "displays all active screen sessions" << std::endl;
     std::cout << std::left << std::setw(20) << "screen -r <name>" << "redraws an existing screen session" << std::endl;
     std::cout << std::left << std::setw(20) << "quit" << "quit program" << std::endl;
 }
@@ -150,7 +192,7 @@ void clearNewline(){
 bool checkCommandValidity(std::string &input) {
     bool isValid = false;
     //TODO: update the command names to have spaces once spaced version is working
-    std::string commands[] = {"screen-s<name>", "screen-ls", "screen-r<name>"};
+    std::string commands[] = {"screen -s <name>", "screen -ls", "screen -r <name>"};
 
     for (std::string &command : commands) {
         if (command == input) {
@@ -161,4 +203,16 @@ bool checkCommandValidity(std::string &input) {
     return isValid;
 }
 
+std::string getFormattedTime() {
+    // Get the current time
+    std::time_t currentTime = std::time(nullptr);
+    std::tm* localTime = std::localtime(&currentTime);  // Convert to local time
 
+    // Create a string stream to store the formatted time
+    std::ostringstream oss;
+
+    // Use std::put_time to format the time as MM/DD/YYYY, HH:MM:SS AM/PM
+    oss << std::put_time(localTime, "%m/%d/%Y, %I:%M:%S %p");
+
+    return oss.str();  // Return the formatted string
+}

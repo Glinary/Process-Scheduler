@@ -4,10 +4,10 @@
 
 class ScreenSession {
     std::string processName;
-    std::time_t timestamp;
+    std::string timestamp;
 
     public:
-        ScreenSession(std::string &processName, std::time_t timestamp) {
+        ScreenSession(std::string &processName, std::string timestamp) {
             this->processName = processName;
             this->timestamp = timestamp;
         }
