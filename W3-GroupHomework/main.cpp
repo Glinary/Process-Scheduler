@@ -5,6 +5,7 @@
 #include <sstream> 
 #include <iostream>
 #include <iomanip>
+#include <limits>
 
 /********** PROTOTYPE FUNCTIONS **********/
 void displayMenu(); 
@@ -61,14 +62,12 @@ int main(void) {
                 sessions.back().viewSession();
                 waitForExit();
                 displayMenu();
-                clearNewline();
 
             }  else if (parsedCommand[1] == "-ls") {
 
                 displayActiveSessions();
                 waitForExit();
                 displayMenu();
-                clearNewline();
             
             } else if (parsedCommand[0] == "screen" && parsedCommand[1] == "-r") {
 
@@ -114,21 +113,18 @@ int main(void) {
 
                 waitForExit();
                 displayMenu();
-                clearNewline();
             } else {
                 std::cout << "I do not understand";
-                clearNewline();
             }
         } else {
             std::cout << "I do not understand";
-            clearNewline();
         }
 
-        
+        clearNewline();
     }
 
-        return 0;
-    }
+        
+}
 /********** CONTROLLER **********/
 
 
