@@ -70,10 +70,9 @@ int main(void) {
                 displayMenu();
                 clearNewline();
             
-                //TODO: replace this with multiple word strings e.g. "screen -r <name>"
             } else if (parsedCommand[0] == "screen" && parsedCommand[1] == "-r") {
 
-                //TODO: if <name> does not exist, skip this section and user should be informed
+                // if <name> does not exist, skip this section and user should be informed
 
                 // //
                 // std::string processName;
