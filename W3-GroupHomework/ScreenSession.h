@@ -13,7 +13,21 @@ class ScreenSession {
         }
 
     void viewSession() {
-        std::cout << "Process Name: " << processName << std::endl;
+        system("cls");
+        std::cout << "Process Name: " << this->processName << "          Timestamp: " << this->timestamp << std::endl;
+        std::cout << "#1" << std::endl;
+        std::cout << "#2" << std::endl;
+        std::cout << "#3" << std::endl;
+        std::cout << "#4" << std::endl;
+        std::cout << "#5" << std::endl;
+    }
+
+    void viewSessionSummary() {
+        std::cout << "Process Name: " << this->processName << "          Timestamp: " << this->timestamp << std::endl;
+    }
+
+    std::string getProcessName() {
+        return this->processName;
     }
 
     bool leaveSession() {
