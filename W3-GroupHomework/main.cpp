@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream> 
 #include <iostream>
+#include <iomanip>
 
 /********** PROTOTYPE FUNCTIONS **********/
 void displayMenu(); 
@@ -70,20 +71,48 @@ int main(void) {
                 clearNewline();
             
                 //TODO: replace this with multiple word strings e.g. "screen -r <name>"
-            } else if (command == "screen-r<name>") {
+            } else if (parsedCommand[0] == "screen" && parsedCommand[1] == "-r") {
 
                 //TODO: if <name> does not exist, skip this section and user should be informed
 
-                std::string processName;
-                std::string dumpName = "test1"; //TODO: REPLACE THIS WITH PROPER VARIABLE
+                // //
+                // std::string processName;
+                // std::string dumpName = "test1"; //TODO: REPLACE THIS WITH PROPER VARIABLE
 
-                for (ScreenSession &session : sessions) {
-                    processName = session.getProcessName();
-                    if (processName == dumpName) {
-                        session.viewSession();
-                        break;
+                // for (ScreenSession &session : sessions) {
+                //     processName = session.getProcessName();
+                //     if (processName == dumpName) {
+                //         session.viewSession();
+                //         break;
+                //     }
+                // }
+                // //
+
+                if (parsedCommand.size() < 3) {
+                    std::cout << "\n";
+                    std::cout << "Error: No process name provided." << std::endl;
+                    std::cout << "Please type 'exit' to go back to the menu." << std::endl;
+                    std::cout << "\n";
+                } else {
+                    std::string processName = parsedCommand[2];
+                    bool sessionFound = false;
+
+                    for (ScreenSession &session : sessions) {
+                        if (session.getProcessName() == processName) {
+                            session.viewSession();
+                            sessionFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!sessionFound) {
+                        std::cout << "\n";
+                        std::cout << "Error: Session with name '" << processName << "' does not exist." << std::endl;
+                        std::cout << "Please type 'exit' to go back to the menu." << std::endl;
+                        std::cout << "\n";
                     }
                 }
+
                 waitForExit();
                 displayMenu();
                 clearNewline();
@@ -99,22 +128,19 @@ int main(void) {
         
     }
 
-    
-
-    return 0;
-}
+        return 0;
+    }
 /********** CONTROLLER **********/
 
 
 /********** SHOW MAIN MENU **********/ 
 void displayMenu() {
     std::cout << "Main Menu" << std::endl;
-    std::cout << "command:" << "                 "<< "description" << std::endl; 
-    //TODO: update the command names to have spaces once spaced version is working
-    std::cout << "screen-s<name> " << "          " << "creates a new screen session" << std::endl;
-    std::cout << "screen-ls" << "          " << "displays all active screen sessions" << std::endl;
-    std::cout << "screen-r<name> " << "          " << "redraws an existing screen session" << std::endl;
-    std::cout << "quit " << "          " << "quit program" << std::endl;
+    std::cout << std::left << std::setw(20) << "command:" << "description" << std::endl;
+    std::cout << std::left << std::setw(20) << "screen-s<name>" << "creates a new screen session" << std::endl;
+    std::cout << std::left << std::setw(20) << "screen-ls" << "displays all active screen sessions" << std::endl;
+    std::cout << std::left << std::setw(20) << "screen -r <name>" << "redraws an existing screen session" << std::endl;
+    std::cout << std::left << std::setw(20) << "quit" << "quit program" << std::endl;
 }
 /********** SHOW MAIN MENU **********/ 
 
