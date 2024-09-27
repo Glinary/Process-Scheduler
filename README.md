@@ -28,3 +28,4 @@ exit
 1. `screen -s <session name>` - Starts a new screen session and moves to the new screen session.
 1. `screen -r <session name>` - Redraws an existing screen session.
 1. `exit` - Returns to the main menu from a screen session.
+2. `quit` - Stops the program.
