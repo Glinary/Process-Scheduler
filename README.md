@@ -1,6 +1,5 @@
-# Process-Scheduler
-
+# CSOPESY-Homeworks
 
 ## Directory Guide
-1. [HW2 - Setting Up OS Emulator](https://github.com/Glinary/Process-Scheduler/tree/group-hw-week2)
-1. [HW3 - Designing Console Layouts](https://github.com/Glinary/Process-Scheduler/tree/group-hw-week3) 
+1. [HW4 - Creating Customized CLI Layouts](https://github.com/axvolkzki/CSOPESY-Homeworks/tree/week-4-homework)
+2. [HW5 - Immediate-Mode Mockup - the Marquee Console](https://github.com/axvolkzki/CSOPESY-Homeworks/tree/week-5-homework)
