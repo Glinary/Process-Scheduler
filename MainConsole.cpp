@@ -4,7 +4,6 @@
 #include <iostream>
 #include <Windows.h>
 #include "DummyProcessLayout.h"
-//#include "DummyLayout.h"
 
 
 // Constructor: Set the name of the console when MainConsole is instantiated
@@ -85,13 +84,12 @@ void MainConsole::process() {
 			}*/
 		}
 		else if (commandMain == "dummy-layout") {
-			String processName = commandMain;
+			// clear the screen
+			system("cls");
 
-			std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName);
-			std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);
-
-			ConsoleManager::getInstance()->registerScreen(newScreen);
-			ConsoleManager::getInstance()->switchToScreen(processName);
+			// display the dummy layout
+			DummyProcessLayout dummyLayout;
+			dummyLayout.onEnabled();
 		}
 		else {
 			recognizeCommand(commandMain);

@@ -16,15 +16,20 @@ struct GPUProcess {
     String memoryUsage;
 };
 
-class DummyProcessLayout : public AConsole
+//class DummyProcessLayout : public AConsole
+class DummyProcessLayout
 {
 public:
-    DummyProcessLayout(std::shared_ptr<Process> process, String processName);
+    /*DummyProcessLayout(std::shared_ptr<Process> process, String processName);*/
 
     // Override the pure virtual functions of AConsole
-    void onEnabled() override;
+    /*void onEnabled() override;
     void display() override;
-    void process() override;
+    void process() override;*/
+
+	void onEnabled();
+	void display();
+	void process();
 
 private:
     std::shared_ptr<Process> attachedProcess;		// The process attached to the screen; class the represents the process; for every base screen, there is a process that contains another set of commands
