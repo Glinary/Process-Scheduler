@@ -35,13 +35,16 @@ public:
 	HANDLE getConsoleHandle() const;												// Returns the console handle
 
 	void setCursorPosition(int posX, int posY) const;								// Sets the cursor position to the specified coordinates
-	
+	void printScreenNames() const;
+
 private:
 	ConsoleManager();																// Constructor
 	~ConsoleManager() = default;													// Destructor
 
 	ConsoleManager(ConsoleManager const&) {};										// Copy constructor is private
-	ConsoleManager& operator=(ConsoleManager const&) {};							// Assignment operator is private
+	ConsoleManager& operator=(ConsoleManager const&) {
+		return *this; // Ensure to return *this
+	};						// Assignment operator is private
 	static ConsoleManager* sharedInstance;											// The instance of ConsoleManager
 
 	ConsoleTable consoleTable;														// The table of consoles

@@ -16,7 +16,7 @@ void MainConsole::onEnabled() {
 
 // Override of display: Called to draw the screen each frame
 void MainConsole::display() {
-	ASCIITextHeader();
+	// ASCIITextHeader();
 }
 
 // Override of process: Handle input commands or other processes here
@@ -51,7 +51,7 @@ void MainConsole::process() {
 		}
 		else if (commandMain == "clear") {
 			system("cls");
-			display();
+			onEnabled();
 		}
 		else if (commandMain.substr(0, 9) == "screen -s" && commandMain.length() > 9) {			// ensure there is process name
 			ConsoleManager::getInstance()->exitApplication();									// Stop the main console process
@@ -78,6 +78,9 @@ void MainConsole::process() {
 		else if (commandMain == "screen -ls") {
 			// List all the screens
 			std::cout << "List of screens: " << std::endl;
+			ConsoleManager::getInstance()->printScreenNames();
+
+			
 
 			/*for (auto const& screen : ConsoleManager::getInstance()->consoleTable) {
 				std::cout << screen.first << std::endl;

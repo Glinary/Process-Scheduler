@@ -64,7 +64,7 @@ void ConsoleManager::switchToScreen(String screenName) {			// switches to the sp
 		system("cls");												// Clear the screen
 		this->previousConsole = this->currentConsole;				// Set the previous console to the current console
 		this->currentConsole = this->consoleTable[screenName];		// Set the current console to the specified console
-		this->currentConsole->onEnabled();							// Call the onEnabled function of the current console
+		this->currentConsole->onEnabled(); 							// Call the onEnabled function of the current console
 	}
 	else {
 		std::cerr << "Screen name " << screenName << " not found. Please check if it is initialized." << std::endl;
@@ -127,4 +127,21 @@ void ConsoleManager::setCursorPosition(int posX, int posY) const {
 	coord.X = posX;
 	coord.Y = posY;
 	SetConsoleCursorPosition(this->consoleHandle, coord);
+}
+
+void ConsoleManager::printScreenNames() const {
+    if (consoleTable.size() <= 2 &&
+        consoleTable.contains(MAIN_CONSOLE) &&
+        consoleTable.contains(MARQUEE_CONSOLE)) {
+        std::cerr << "There are no screens created." << std::endl;
+        return;
+    }
+
+    int count = 0;
+
+    for (const auto& entry : consoleTable) {
+        if (entry.first != MAIN_CONSOLE && entry.first != MARQUEE_CONSOLE) {
+            std::cout << ++count << ": " << entry.first << std::endl;
+        }
+    }
 }
