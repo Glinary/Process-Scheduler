@@ -144,7 +144,7 @@ void displayProcesses(const map<string, Process*>& processes){
     for (const auto& pair : processes) {
         if (!pair.second->getProcessStatus()) {
             // TODO: Add timestamp
-            cout << pair.second->getName() << "timestamp" << ", Core: " << pair.second->getCoreID() << " " << pair.second->getLog().size() << "/200" << endl;
+            cout << pair.second->getName() << " timestamp " << " Core: " << pair.second->getCoreID() << " " << pair.second->getLog().size() << "/200" << endl;
             any_ongoing = true;
         }
     }
@@ -212,9 +212,6 @@ void waitForExit() {
     
 }
 
-void getCommand(std::string *command) {
-    std::getline(std::cin, *command);
-}
 
 
 int main(){
@@ -223,6 +220,8 @@ int main(){
     Scheduler* random = new Scheduler(1);       // placeholder only
 
     bool running =  true;
+
+    displayMenu();
 
     while (running){
         string command;
@@ -237,22 +236,28 @@ int main(){
         if (command == "quit"){
             return 0;
         }
-         else if (action == "screen" && option == "-s") {
+         else if (action == "screen" && option == "-s") {    
             string process_name = name;
+
+            if (name.empty()) {
+                cout << "No name provided for the process." << endl;
+                continue;
+            }
 
             // Schedule screen creation
             Process* process = new Process(name);
-            
             scheduler.schedule_task(create_task, process, processes, 0, random);
 
             process->enterProcess();
             waitForExit();
+            displayMenu();
 
         } else if (action == "screen" && option == "-r") {
             if (processes.count(name) > 0) {
 
                 processes[name]->enterProcess();
                 waitForExit();
+                displayMenu();
 
             } else {
                 cout << "Screen " << name << " not found." << endl;
