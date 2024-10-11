@@ -45,13 +45,14 @@ class Process {
 
             // TODO: Fix template: <Timestamp  Core#  Print Message>
             for (int i = 0; i < logs.size(); i++){
-                cout << getCurrentTimestamp() << "   Core: " << this->coreID << "   " << logs[i] << "   # " << i << endl;
+                // cout << "Core: " << this->coreID << "   " << logs[i] << "   # " << i << endl;
+                // timestamp        coreID  message
+                string timestamp = logs[i].substr(0, 19);
+                cout << timestamp << "   " << "Core: " << this->coreID << "   " << logs[i].substr(20) << "   # " << i << endl;
             }
         }
 
         void addLog(string log){
-            this->logs.push_back(log);
-
             // Add timestamp to the log
             string timestamped_log = getCurrentTimestamp() + " " + log;
             this->logs.push_back(timestamped_log);
@@ -198,13 +199,14 @@ void displayProcesses(const map<string, Process*>& processes){
             // Truncate the process name to 10 characters
             string process_name = pair.second->getName();
             int log_size = pair.second->getLog().size();
+            string timestamp = pair.second->getLog().back().substr(0, 19);
 
             if (process_name.length() > 10) {
                 process_name = "..." + process_name.substr(process_name.length() - 7);
             }
 
             cout << std::left   << std::setw(11) << process_name << "   "
-                                << std::setw(23) << "timestamp" << "     "
+                                << std::setw(23) << timestamp << "     "
                                 << std::setw(10) << "Finished" << "    "
                                 << std::setw(10) << log_size << " / 200" << endl;
 
