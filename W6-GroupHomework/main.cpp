@@ -208,7 +208,7 @@ void displayProcesses(const map<string, Process*>& processes){
             cout << std::left   << std::setw(11) << process_name << "   "
                                 << std::setw(23) << timestamp << "     "
                                 << std::setw(10) << "Finished" << "    "
-                                << std::setw(10) << log_size << " / 200" << endl;
+                                << std::setw(10) << log_size << " / 100" << endl;
 
             any_finished = true;
         }
@@ -246,7 +246,7 @@ void displayMenu() {
     std::cout << std::left << std::setw(20) << "screen -s <name>" << "creates a new screen session" << std::endl;
     std::cout << std::left << std::setw(20) << "screen -ls" << "displays all active screen sessions" << std::endl;
     std::cout << std::left << std::setw(20) << "screen -r <name>" << "redraws an existing screen session" << std::endl;
-    std::cout << std::left << std::setw(20) << "quit" << "quit program" << std::endl;
+    std::cout << std::left << std::setw(20) << "exit" << "exit program" << std::endl;
 }
 
 void waitForExit() {
@@ -284,7 +284,7 @@ int main(){
         string action, option, name;
         iss >> action >> option >> name;
 
-        if (command == "quit"){
+        if (command == "exit"){
             return 0;
         }
          else if (action == "screen" && option == "-s") {    
