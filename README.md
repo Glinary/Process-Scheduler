@@ -1,8 +1,9 @@
 # Process-Scheduler
 
-
 # How to compile & run the program on Windows
-1. Ensure that you have [MinGW](https://sourceforge.net/projects/mingw/) installed for Windows users
+1. Ensure that you have a g++ compiler of at least `v.13.2.0`installed
+1. You may check your g++ version via terminal `g++ --version`
+1. If your version does not meet the requirements, follow the installation [here](https://code.visualstudio.com/docs/cpp/config-mingw?fbclid=IwY2xjawF03GBleHRuA2FlbQIxMAABHc52hi3e68KSK4yoHkDjeZxf8ZYfYf0Yen4bPXsfBKWWcj7Qo7rRbslqRg_aem_K0z-kaO9_OJWARIqRSaD4g#_prerequisites)
 1. Open a terminal on the same directory `W6-GroupHomework`
 1. Type the command `g++ main.cpp -o start.exe`
 1. Type the command `./start.exe`
