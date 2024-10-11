@@ -10,7 +10,7 @@
 #include <condition_variable>
 #include <limits>
 #include <iomanip>
-
+#include <chrono> // Include chrono for timestamp
 
 using namespace std;
 
@@ -23,6 +23,16 @@ class Process {
         int coreID;
         // mutex mutex_;
 
+        // Function to get the current timestamp as a string
+        string getCurrentTimestamp() {
+            auto now = chrono::system_clock::now();
+            time_t now_time = chrono::system_clock::to_time_t(now);
+            tm* now_tm = localtime(&now_time);
+            stringstream ss;
+            ss << put_time(now_tm, "%Y-%m-%d %H:%M:%S");
+            return ss.str();
+        }
+
     public:
         explicit Process(const string name) : name(name){}
 
@@ -33,12 +43,14 @@ class Process {
 
             // TODO: Fix template: <Timestamp  Core#  Print Message>
             for (int i = 0; i < logs.size(); i++){
-                  cout << logs[i] << "   # " << i << endl; 
+                cout << logs[i] << " Core: " << this->coreID << "   # " << i << endl; 
             }
         }
 
         void addLog(string log){
-            this->logs.push_back(log);
+            // Add timestamp to the log
+            string timestamped_log = getCurrentTimestamp() + " " + log;
+            this->logs.push_back(timestamped_log);
         }  
         vector<string> getLog(){
             return this->logs;
@@ -144,7 +156,7 @@ void displayProcesses(const map<string, Process*>& processes){
     for (const auto& pair : processes) {
         if (!pair.second->getProcessStatus()) {
             // TODO: Add timestamp
-            cout << pair.second->getName() << " timestamp " << " Core: " << pair.second->getCoreID() << " " << pair.second->getLog().size() << "/200" << endl;
+            cout << pair.second->getName() << " " << pair.second->getLog().back().substr(0, 19) << " Core: " << pair.second->getCoreID() << " " << pair.second->getLog().size() << "/200" << endl;
             any_ongoing = true;
         }
     }
