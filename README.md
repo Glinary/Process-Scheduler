@@ -12,7 +12,8 @@
 # How to compile & run the program on MacOS
 1. Install Xcode Command Line Tools `xcode-select --install`.
 1. Open a terminal in the same directory as `W6-GroupHomework`.
-1. Type the command `g++ main.cpp -o start`.
+1. Type the command `g++ main.cpp -o start`. 
+   Note: if you are using C++11 Standard, use the command `g++ -std=c++11 main.cpp -o start`
 1. Type the command `./start`.
 1. Wait for the Terminal to start running. 
 
