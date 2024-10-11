@@ -11,6 +11,7 @@
 #include <limits>
 #include <iomanip>
 #include <fstream>
+#include <chrono> // Include chrono for timestamp
 
 
 using namespace std;
@@ -24,6 +25,16 @@ class Process {
         int coreID;
         // mutex mutex_;
 
+        // Function to get the current timestamp as a string
+        string getCurrentTimestamp() {
+            auto now = chrono::system_clock::now();
+            time_t now_time = chrono::system_clock::to_time_t(now);
+            tm* now_tm = localtime(&now_time);
+            stringstream ss;
+            ss << put_time(now_tm, "%Y-%m-%d %H:%M:%S");
+            return ss.str();
+        }
+
     public:
         explicit Process(const string name) : name(name){}
 
@@ -34,12 +45,16 @@ class Process {
 
             // TODO: Fix template: <Timestamp  Core#  Print Message>
             for (int i = 0; i < logs.size(); i++){
-                cout << " <timestamp> " << " Core:  " << this->coreID << " " << logs[i] << endl;
+                cout << getCurrentTimestamp() << "   Core: " << this->coreID << "   " << logs[i] << "   # " << i << endl;
             }
         }
 
         void addLog(string log){
             this->logs.push_back(log);
+
+            // Add timestamp to the log
+            string timestamped_log = getCurrentTimestamp() + " " + log;
+            this->logs.push_back(timestamped_log);
         }  
         vector<string> getLog(){
             return this->logs;
@@ -153,6 +168,7 @@ void displayProcesses(const map<string, Process*>& processes){
             string process_name = pair.second->getName();
             int coreID = pair.second->getCoreID();
             int log_size = pair.second->getLog().size();
+            string timestamp = pair.second->getLog().back().substr(0, 19);
 
             if (process_name.length() > 10) {
                 process_name = "..." + process_name.substr(process_name.length() - 7);
@@ -160,7 +176,7 @@ void displayProcesses(const map<string, Process*>& processes){
 
             // TODO: Add timestamp
             cout << std::left   << std::setw(11) << process_name << "   "
-                                << std::setw(23) << "timestamp" << "     "
+                                << std::setw(23) << timestamp << "     "
                                 << std::setw(10) << "Core: " << coreID << "     "
                                 << std::setw(10) << log_size << "/100" << endl;
             
