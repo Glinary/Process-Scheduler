@@ -10,7 +10,8 @@
 #include <condition_variable>
 #include <limits>
 #include <iomanip>
-#include <chrono> // Include chrono for timestamp
+#include <fstream>
+
 
 using namespace std;
 
@@ -23,16 +24,6 @@ class Process {
         int coreID;
         // mutex mutex_;
 
-        // Function to get the current timestamp as a string
-        string getCurrentTimestamp() {
-            auto now = chrono::system_clock::now();
-            time_t now_time = chrono::system_clock::to_time_t(now);
-            tm* now_tm = localtime(&now_time);
-            stringstream ss;
-            ss << put_time(now_tm, "%Y-%m-%d %H:%M:%S");
-            return ss.str();
-        }
-
     public:
         explicit Process(const string name) : name(name){}
 
@@ -43,14 +34,12 @@ class Process {
 
             // TODO: Fix template: <Timestamp  Core#  Print Message>
             for (int i = 0; i < logs.size(); i++){
-                cout << logs[i] << " Core: " << this->coreID << "   # " << i << endl; 
+                cout << " <timestamp> " << " Core:  " << this->coreID << " " << logs[i] << endl;
             }
         }
 
         void addLog(string log){
-            // Add timestamp to the log
-            string timestamped_log = getCurrentTimestamp() + " " + log;
-            this->logs.push_back(timestamped_log);
+            this->logs.push_back(log);
         }  
         vector<string> getLog(){
             return this->logs;
@@ -143,20 +132,38 @@ class Scheduler {
             stop = true;
         }
         condition.notify_all();
+
         for (thread &worker : workers)
-            worker.join();
+            if (worker.joinable()) {
+                worker.detach();
+            }
     }
 };
 
 
 void displayProcesses(const map<string, Process*>& processes){
+    cout << std::setfill('-') << std::setw(40) << "-" << std::endl;
     cout << "\nRunning Processes:\n";
     bool any_ongoing = false;
 
+    cout << std::setfill(' ') << std::setw(0);
     for (const auto& pair : processes) {
         if (!pair.second->getProcessStatus()) {
+            // Truncate the process name to 10 characters
+            string process_name = pair.second->getName();
+            int coreID = pair.second->getCoreID();
+            int log_size = pair.second->getLog().size();
+
+            if (process_name.length() > 10) {
+                process_name = "..." + process_name.substr(process_name.length() - 7);
+            }
+
             // TODO: Add timestamp
-            cout << pair.second->getName() << " " << pair.second->getLog().back().substr(0, 19) << " Core: " << pair.second->getCoreID() << " " << pair.second->getLog().size() << "/200" << endl;
+            cout << std::left   << std::setw(11) << process_name << "   "
+                                << std::setw(23) << "timestamp" << "     "
+                                << std::setw(10) << "Core: " << coreID << "     "
+                                << std::setw(10) << log_size << "/100" << endl;
+            
             any_ongoing = true;
         }
     }
@@ -168,9 +175,23 @@ void displayProcesses(const map<string, Process*>& processes){
     //TODO: Fix format/template
     cout << "\nFinished Processes:\n";
     bool any_finished = false;
+
+    cout << std::setfill(' ') << std::setw(0);
     for (const auto& pair : processes) {
         if (pair.second->getProcessStatus()) {
-            cout << "Process: " << pair.second->getName() << ", Messages: " << pair.second->getLog().size() << endl;
+            // Truncate the process name to 10 characters
+            string process_name = pair.second->getName();
+            int log_size = pair.second->getLog().size();
+
+            if (process_name.length() > 10) {
+                process_name = "..." + process_name.substr(process_name.length() - 7);
+            }
+
+            cout << std::left   << std::setw(11) << process_name << "   "
+                                << std::setw(23) << "timestamp" << "     "
+                                << std::setw(10) << "Finished" << "    "
+                                << std::setw(10) << log_size << " / 200" << endl;
+
             any_finished = true;
         }
     }
@@ -178,7 +199,7 @@ void displayProcesses(const map<string, Process*>& processes){
         cout << "No finished processes.\n";
     }
     cout << endl;
-
+    cout << std::setfill('-') << std::setw(40) << "-" << std::endl;
 }
 
 // task that gets added to queue (function tasks)
@@ -188,7 +209,7 @@ void create_task(Process* process, map<string, Process*>& processes, int coreID,
     coreID = sched-> getAvailableCore();
     process->setCoreID(coreID);
     
-    for (int i = 0; i < 200; ++i) {
+    for (int i = 0; i < 100; ++i) {
         process->addLog("message now");
         this_thread::sleep_for(chrono::milliseconds(100));  // delay to capture small changes in print
     }
@@ -227,7 +248,7 @@ void waitForExit() {
 
 
 int main(){
-    Scheduler scheduler(4);
+    Scheduler* scheduler = new Scheduler(4);
     map<string, Process*> processes;
     Scheduler* random = new Scheduler(1);       // placeholder only
 
@@ -258,7 +279,8 @@ int main(){
 
             // Schedule screen creation
             Process* process = new Process(name);
-            scheduler.schedule_task(create_task, process, processes, 0, random);
+            scheduler->schedule_task(create_task, process, processes, 0, random);
+            // scheduler.schedule_task(create_task, process, processes, 0, random);
 
             process->enterProcess();
             waitForExit();
@@ -274,11 +296,51 @@ int main(){
             } else {
                 cout << "Screen " << name << " not found." << endl;
             }
+        } else if (action == "screen" && option == "bulk") {
+            // TODO: Bulk creation of 10 processes (for demo)
+
+            for (int i = 0; i < 10; i++) {
+                string process_name = "Process" + to_string(i);
+                cout << "Creating process " << process_name << endl;
+
+                // Create process
+                Process* process = new Process(process_name);
+                scheduler->schedule_task(create_task, process, processes, 0, random);
+                this_thread::sleep_for(chrono::milliseconds(1000));  // delay to capture small changes in print
+            }
         } else if (action == "screen" && option == "-ls") {
+            // Display processes
             displayProcesses(processes);
-        
-        // TODO: Bulk creation of 10 processes (for demo)
-        // TODO: Print (export to text file)
+
+            // TODO: Print (export to text file)
+            cout << "Enter 'print' to export logs to text file." << endl;
+            string inputPrint;
+            getline(cin, inputPrint);
+
+            if (inputPrint == "print") {
+                int fileCounter = 1;  // To give unique filenames for processes
+                for (const auto& pair : processes) {
+                    // Create a unique file name for each process
+                    string file_name = "process_" + pair.second->getName() + "_" + to_string(fileCounter) + ".txt"; 
+                    ofstream file(file_name);
+
+                    if (file.is_open()) {
+                        file << "Process Name: " << pair.second->getName() << endl;
+                        file << "Logs: " << endl;
+
+                        // Write each log entry for this process
+                        for (int i = 0; i < pair.second->getLog().size(); i++) {
+                            file << pair.second->getLog()[i] << "   # " << i << endl;
+                        }
+
+                        file.close();
+                        cout << "Logs for process " << pair.second->getName() << " exported to " << file_name << endl;
+                    } else {
+                        cout << "Unable to open file: " << file_name << endl;
+                    }
+                    fileCounter++;  // Increment the file counter for unique file names
+                }
+            }
 
         } else {
             cout << "Invalid command." << endl;
@@ -288,6 +350,8 @@ int main(){
     for (auto& pair : processes) {
         delete pair.second; // Free allocated memory for Process objects
     }
+
+    delete scheduler;
 
     return 0;
 }
