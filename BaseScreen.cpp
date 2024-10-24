@@ -10,17 +10,22 @@
 BaseScreen::BaseScreen(std::shared_ptr<Process> process, String processName) : AConsole(processName), attachedProcess(process) {};
 
 void BaseScreen::onEnabled() {
-	std::cout << "Process Name: " << attachedProcess->getName() << std::endl;
-	std::cout << " " << std::endl;
+	std::cout << "BaseScreen enabled" << std::endl;
 }
 
 void BaseScreen::display() {
-    printProcessInfo();
+	/*if (!refreshed) {
+		refreshed = true;
+		std::cout << "Process Name: " << attachedProcess->getName() << std::endl;
+		std::cout << " " << std::endl;
+		printProcessInfo();
+	}*/
+
+	std::cout << "Temporarily displaying the process layout" << std::endl;
 }
 
 
 void BaseScreen::process() {
-	printProcessInfo();
 	String commandBaseScreen;
     
 	while (true) {
@@ -35,27 +40,10 @@ void BaseScreen::process() {
 			break;
 		}
 		if (commandBaseScreen == "process-smi") {
-
+			attachedProcess->displayProcessInfo();
 		}
 		else {
-            // Increment the current instruction line for any command
-            attachedProcess->incrementCurrentInstructionLine();
-
-			// Increment the total number of lines of instructions
-			attachedProcess->storePrintedLines(commandBaseScreen);
-
-			// display the header with the current process information
-			printProcessInfo();
-
-            std::cout << "Command '" << commandBaseScreen << "' is not recognized." << std::endl;
-            std::cout << "Current line of instruction: " << attachedProcess->getCurrentInstructionLine() << " / " << attachedProcess->getTotalLinesOfInstructions() << std::endl;
+			std::cout << "Command not recognized. Please try again." << std::endl;
 		}
 	}
-}
-
-// Helper function to print the process information
-void BaseScreen::printProcessInfo() const {
-	// Dynamically display the process information
-	std::cout << "Current line of instruction / Total line of instruction: " << attachedProcess->getCurrentInstructionLine() << " / " << attachedProcess->getTotalLinesOfInstructions() << std::endl;
-	std::cout << "Created at: " << attachedProcess->getFormattedTimestamp() << std::endl;
 }

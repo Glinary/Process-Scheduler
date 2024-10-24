@@ -6,55 +6,39 @@
 #include <chrono>
 #include <iomanip>
 #include <limits>
+#include "MainConsole.h"
+#include <random>
 
-Process::Process(const String& processName) {
-    name = processName;
+Process::Process(const String& processName, const MainConsole::Config& config)
+    : processName(processName), config(config) {
 
     // Get current time
     std::time_t currentTime = std::time(nullptr);
 
     // Use localtime_s to safely convert time_t to struct tm
-    localtime_s(&creationTime, &currentTime);  // Pass the current time and store the result in creationTime
+    localtime_s(&processCreationTime, &currentTime);
 
     processContents = StringVector();  // Initialize the process contents (instructions)
-    currentInstructionLine = 1;  // Initialize the current instruction line
-    totalLinesOfInstructions = 1;  // Initialize the total number of instructions (to be set later)
+    processCurrentInstructionLine = 1;  // Initialize the current instruction line
+    processTotalInstructions = 0;  // Initialize the total instructions
 }
 
-// Helper function to store printed lines (instructions)
-void Process::storePrintedLines(const String& line) {
-    processContents.push_back(line);
-    totalLinesOfInstructions++;  // Increment the total number of instructions
+void Process::displayProcessInfo() const {
+    std::cout << "Process Name: " << processName << std::endl;
+    std::cout << "Current Line: " << processCurrentInstructionLine << std::endl;
+	std::cout << "Total Instructions: " << processTotalInstructions << std::endl;
+
+	std::cout << "Min. instrcutions: " << config.min_ins << std::endl;
+	std::cout << "Max. instrcutions: " << config.max_ins << std::endl;
 }
 
-// Getters
-String Process::getName() const {
-    return name;
-}
+// Remove the const here as it modifies processTotalInstructions
+void Process::generateRandomNumber()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(config.min_ins, config.max_ins);
 
-// Method to return the formatted timestamp
-String Process::getFormattedTimestamp() const {
-    std::ostringstream oss;  // Declare ostringstream here to avoid scope issues
-    // Format: MM/DD/YYYY, HH:MM:SS AM/PM
-    oss << std::put_time(&creationTime, "%m/%d/%Y, %I:%M:%S %p");
-    return oss.str();  // Return the formatted timestamp as a string
-}
-
-// Method to increment the current instruction line
-void Process::incrementCurrentInstructionLine() {
-    currentInstructionLine++;
-}
-
-// Method to reset the current instruction line to the first line
-void Process::resetCurrentInstructionLine() {
-    currentInstructionLine = 1;
-}
-
-// Getters for current instruction line and total instructions
-int Process::getCurrentInstructionLine() const {
-    return currentInstructionLine;
-}
-
-int Process::getTotalLinesOfInstructions() const {
-    return totalLinesOfInstructions;
+    // set the processTotalInstructions
+    processTotalInstructions = dis(gen);
 }

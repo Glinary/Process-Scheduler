@@ -108,7 +108,7 @@ void MainConsole::process() {
 				String processName = commandMain.substr(10, commandMain.length() - 10);				// get the process name
 
 				// Create a new process and attach it to a new screen
-				std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName);
+				std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName, config);
 				std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	// Create a new screen
 
 				// Register the new screen and switch to it

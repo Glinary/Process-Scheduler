@@ -1,30 +1,27 @@
+// Process.h
 #pragma once
-#include "TypedefRepo.h"
 #include <string>
+#include <vector>
 #include <ctime>
-#include <sstream> 
+#include "MainConsole.h"
 
-// Process class is the reference to the process that is being executed in the BaseScreen
-class Process
-{
+class Process {
 public:
-	Process(const String& processName);			// Constructor
-	
-	// Helper functions
-	void storePrintedLines(const String& line);	// Store the printed line in the process; starting in the Printed "Enter command: " line
-	void incrementCurrentInstructionLine();		// Increment the current instruction line of the process
-	void resetCurrentInstructionLine();			// Reset the current instruction line of the process
+    // Add a new constructor that takes Config as a parameter
+    Process(const String& processName, const MainConsole::Config& config);
 
-	// Getters
-	String getName() const;						// Get the name of the process
-	String getFormattedTimestamp() const;		// Get the formatted timestamp
-	int getCurrentInstructionLine() const;		// Get the current line of the process
-	int getTotalLinesOfInstructions() const;	// Get the total number of lines in the process
-	
+    // Existing methods
+	void displayProcessInfo() const;
+
+    void generateRandomNumber();
+
 private:
-	String name;								// The name of the process
-	std::tm creationTime;						// The creation time of the process; time when the process was created and cannot be changed
-	StringVector processContents;				// The contents of the process; the lines of code in the process; will be inscremented as the process is executed with new lines of code and commands
-	int currentInstructionLine;					// The current instruction line of the process; the line of code that is currently being executed
-	int totalLinesOfInstructions;				// The total number of lines in the process
+    String processName;
+    uint32_t processCurrentInstructionLine;
+	uint32_t processTotalInstructions;
+    std::tm processCreationTime;
+    std::vector<String> processContents;
+
+    // Add a member variable to hold the config
+    MainConsole::Config config;
 };
