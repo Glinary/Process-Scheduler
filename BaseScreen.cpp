@@ -10,7 +10,7 @@
 BaseScreen::BaseScreen(std::shared_ptr<Process> process, String processName) : AConsole(processName), attachedProcess(process) {};
 
 void BaseScreen::onEnabled() {
-	std::cout << "BaseScreen enabled" << std::endl;
+	attachedProcess->displayProcessInfo();
 }
 
 void BaseScreen::display() {
@@ -29,8 +29,9 @@ void BaseScreen::process() {
 	String commandBaseScreen;
     
 	while (true) {
-		std::cout << "Enter a command: ";
+		std::cout << "\nEnter a command: ";
 		std::getline(std::cin, commandBaseScreen);
+		std::cout << "\n";
 
         // Increment the current line of code
 

@@ -10,10 +10,8 @@ public:
     // Add a new constructor that takes Config as a parameter
     Process(const String& processName, const MainConsole::Config& config);
 
-    // Existing methods
+    void updateProcessInfo() const;
 	void displayProcessInfo() const;
-
-    void generateRandomNumber();
 
 private:
     String processName;
@@ -21,7 +19,8 @@ private:
 	uint32_t processTotalInstructions;
     std::tm processCreationTime;
     std::vector<String> processContents;
-
-    // Add a member variable to hold the config
     MainConsole::Config config;
+    
+	void displayProcessHeader() const;
+    uint32_t generateRandomNumber();
 };

@@ -1,9 +1,2 @@
 ﻿  BaseScreen.cpp
-  ConsoleManager.cpp
-  DummyProcessLayout.cpp
-  main.cpp
-  MainConsole.cpp
-  MarqueeConsole.cpp
-  Process.cpp
-  Generating Code...
   process-scheduler.vcxproj -> C:\Users\Acer\OneDrive\Desktop\GitHub\CSOPESY\Process-Scheduler\x64\Debug\process-scheduler.exe
