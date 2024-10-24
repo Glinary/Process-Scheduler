@@ -20,6 +20,7 @@ private:
     std::tm processCreationTime;
     std::vector<String> processContents;
     MainConsole::Config config;
+    bool isFinished;
     
 	void displayProcessHeader() const;
     uint32_t generateRandomNumber();

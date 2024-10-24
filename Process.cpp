@@ -21,6 +21,7 @@ Process::Process(const String& processName, const MainConsole::Config& config)
     processContents = StringVector();       // Initialize the process contents (instructions)
     processCurrentInstructionLine = 1;      // Initialize the current instruction line
 	processTotalInstructions = generateRandomNumber();  // Initialize the total instructions
+	isFinished = false;                     // Initialize the process as not finished
 }
 
 void Process::displayProcessInfo() const {
