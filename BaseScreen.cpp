@@ -9,21 +9,19 @@
 
 BaseScreen::BaseScreen(std::shared_ptr<Process> process, String processName) : AConsole(processName), attachedProcess(process) {};
 
-// onEnabled: called when the screen is activated
 void BaseScreen::onEnabled() {
 	std::cout << "Process Name: " << attachedProcess->getName() << std::endl;
 	std::cout << " " << std::endl;
 }
 
-// display: called to refresh or display the screen
 void BaseScreen::display() {
-    printProcessInfo();   // Re-display the process information if needed
+    printProcessInfo();
 }
 
-// process: called to handle user input
+
 void BaseScreen::process() {
-	printProcessInfo();						// Display the process information
-	String commandBaseScreen;				// The command entered by the user
+	printProcessInfo();
+	String commandBaseScreen;
     
 	while (true) {
 		std::cout << "Enter a command: ";
@@ -35,6 +33,9 @@ void BaseScreen::process() {
 			ConsoleManager::getInstance()->exitApplication();			// Exit the application
 			ConsoleManager::getInstance()->switchConsole(MAIN_CONSOLE);  // Exit to the previous console
 			break;
+		}
+		if (commandBaseScreen == "process-smi") {
+
 		}
 		else {
             // Increment the current instruction line for any command
