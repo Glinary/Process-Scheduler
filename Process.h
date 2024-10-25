@@ -4,6 +4,7 @@
 #include <vector>
 #include <ctime>
 #include "MainConsole.h"
+#include <cstdint>
 
 class Process {
 public:
