@@ -116,8 +116,8 @@ void MainConsole::process() {
 				std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	// Create a new screen
 				std::shared_ptr<Task> newTask =  std::make_shared<Task>(newProcess);
 
-				// scheduler.scheduleProcess(newTask);
-				// scheduler.runScheduler();
+				scheduler.scheduleProcess(newTask);
+				scheduler.runScheduler();
 
 
 				// Register the new screen and switch to it
