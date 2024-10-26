@@ -6,6 +6,8 @@
 #include <Windows.h>
 #include "TypedefRepo.h"										// Contains typedefs for std::string and std::vector<std::string>
 #include "BaseScreen.h"
+#include "Scheduler.h"
+
 
 // Major Screens
 const String MAIN_CONSOLE = "MAIN_CONSOLE";

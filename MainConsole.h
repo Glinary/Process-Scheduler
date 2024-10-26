@@ -2,6 +2,7 @@
 #include "AConsole.h"
 #include <cstdint>
 
+
 class MainConsole : public AConsole
 {
 public:

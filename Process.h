@@ -6,6 +6,7 @@
 #include "MainConsole.h"
 #include <cstdint>
 
+
 class Process {
 public:
     // Add a new constructor that takes Config as a parameter
@@ -13,6 +14,7 @@ public:
 
     void updateProcessInfo() const;
 	void displayProcessInfo() const;
+    void initProcess();
 
 private:
     String processName;
@@ -22,6 +24,8 @@ private:
     std::vector<String> processContents;
     MainConsole::Config config;
     bool isFinished;
+
+
     
 	void displayProcessHeader() const;
     uint32_t generateRandomNumber();
