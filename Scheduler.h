@@ -1,15 +1,34 @@
+#pragma once
 #include <iostream>
 #include <memory>
 #include <queue>
 #include <string>
-#include "Task.h"
+#include "Process.h"
+#include <thread>
+#include <vector>
+#include <mutex>
+#include <condition_variable>
+#include "ThreadPool.h"
 
-// Scheduler class
 class Scheduler {
 public:
-    void scheduleProcess(std::shared_ptr<Task> task);
-    void runScheduler();
+    static Scheduler* getInstance();  // Singleton access
+    static void initialize();	
+
+    void setCore(int maxcpu);
+    void scheduleProcess(const std::shared_ptr<Process>& process);
+    void shutdown(); 
+    
 
 private:
-    std::queue<std::shared_ptr<Task>> processQueue;
+    Scheduler();																// Constructor
+	~Scheduler() = default;
+    
+    static Scheduler* scheduler;											
+
+    void processThread(int coreID); 
+
+    int maxCores;
+    std::unique_ptr<ThreadPool> threadPool;
+    bool isShuttingDown = false;
 };

@@ -13,7 +13,7 @@ int main() {
 
 		ConsoleManager::getInstance()->process();								// contains handling of logic and other non-drawing operations; call its instance
 		ConsoleManager::getInstance()->drawConsole();							// refreshes the screen with the updated information
-
+		
 		// Check if still running
 		running = ConsoleManager::getInstance()->isRunning();
 	}

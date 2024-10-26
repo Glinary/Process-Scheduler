@@ -8,6 +8,8 @@
 #include <limits>
 #include "MainConsole.h"
 #include <random>
+#include <chrono> // Include chrono for timestamp
+#include <thread>
 
 Process::Process(const String& processName, const MainConsole::Config& config)
     : processName(processName), config(config) {
@@ -27,15 +29,26 @@ Process::Process(const String& processName, const MainConsole::Config& config)
 void Process::displayProcessInfo() const {
 	displayProcessHeader();
 	updateProcessInfo();
+
+    // Display all stored instructions
+    for (const auto& instruction : processContents) {
+        std::cout << instruction << std::endl;
+    }
 }
 
 void Process::initProcess() {
-    // for (int i = 0; i < processTotalInstructions; ++i) {
-    //     std::cout << "Instruction # " << (i + 1) << " for process: " << processName << std::endl;
-    // }
+    for (int i = 0; i < 50; ++i) {
+        std::stringstream ss;
+        ss << "Instruction # " << (i + 1) << " for process: " << processName;
+        String instruction = ss.str();  // Capture the instruction as a string
 
-    // std::cout << "Finished executing instructions for process: " << processName << std::endl;
-    std::cout << "TASK ACtIVATED" << processName << std::endl;
+        // Store the instruction in the processContents vector
+        processContents.push_back(instruction);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Delay
+    }
+
+    std::cout << "TASK FINISHED" << processName << std::endl;
 }
 
 void Process::updateProcessInfo() const
@@ -63,3 +76,4 @@ uint32_t Process::generateRandomNumber()
     // set the processTotalInstructions
 	return dis(gen);
 }
+

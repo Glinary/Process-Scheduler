@@ -4,9 +4,12 @@
 
 #include "MainConsole.h"
 #include "MarqueeConsole.h"
+#include "Scheduler.h"
+
 
 
 ConsoleManager* ConsoleManager::sharedInstance = nullptr;				// Initialize the instance of ConsoleManager
+
 
 ConsoleManager* ConsoleManager::getInstance() {							// Singleton pattern; actual pointer
 	return sharedInstance;
@@ -14,6 +17,7 @@ ConsoleManager* ConsoleManager::getInstance() {							// Singleton pattern; actu
 
 void ConsoleManager::initialize() {
 	sharedInstance = new ConsoleManager();								// Initialize the instance of ConsoleManager
+	Scheduler::initialize();
 }
 
 void ConsoleManager::destroy() {
