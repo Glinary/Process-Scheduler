@@ -24,9 +24,7 @@ void Scheduler::setCore(int maxcpu) {
 
 // Schedule a process
 void Scheduler::scheduleProcess(const std::shared_ptr<Process>& process) {
-   std::cout << "Scheduling process..." << std::endl;
     threadPool->enqueue([process]() {
-        std::cout << "Running process in thread." << std::endl;
         process->initProcess();  // Run the process's initialization
     });
 }
