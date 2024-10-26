@@ -8,6 +8,8 @@
 #include <algorithm> // for transform() - converting string to lowercase
 #include <Windows.h>
 #include "DummyProcessLayout.h"
+#include "Scheduler.h"
+
 
 
 // Constructor: Set the name of the console when MainConsole is instantiated
@@ -60,6 +62,8 @@ void MainConsole::process() {
 						std::cout << "Delays per Execution: " << config.delays_per_exec << std::endl;
 						std::cout << "______________________________________________________________\n";
 
+						Scheduler scheduler;
+
 						isFirstCommand = false;
 					}
 					
@@ -110,6 +114,11 @@ void MainConsole::process() {
 				// Create a new process and attach it to a new screen
 				std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName, config);
 				std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	// Create a new screen
+				std::shared_ptr<Task> newTask =  std::make_shared<Task>(newProcess);
+
+				// scheduler.scheduleProcess(newTask);
+				// scheduler.runScheduler();
+
 
 				// Register the new screen and switch to it
 				ConsoleManager::getInstance()->registerScreen(newScreen);					// Register the new screen

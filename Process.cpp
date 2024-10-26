@@ -29,6 +29,15 @@ void Process::displayProcessInfo() const {
 	updateProcessInfo();
 }
 
+void Process::initProcess() {
+    // for (int i = 0; i < processTotalInstructions; ++i) {
+    //     std::cout << "Instruction # " << (i + 1) << " for process: " << processName << std::endl;
+    // }
+
+    // std::cout << "Finished executing instructions for process: " << processName << std::endl;
+    std::cout << "TASK ACtIVATED" << processName << std::endl;
+}
+
 void Process::updateProcessInfo() const
 {
     std::cout << "Current Line: " << processCurrentInstructionLine << std::endl;

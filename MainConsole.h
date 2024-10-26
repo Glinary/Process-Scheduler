@@ -1,6 +1,7 @@
 #pragma once
 #include "AConsole.h"
 #include <cstdint>
+#include "Scheduler.h"
 
 class MainConsole : public AConsole
 {
@@ -26,6 +27,7 @@ public:
 	Config getConfig() const;							// Returns the config
 
 private:
+ 	Scheduler scheduler;
 	Config config;										// Config variable to hold the values of the config.txt
 	void ASCIITextHeader() const;						// Prints the ASCII text header
 	void displayDevelopers() const;						// Displays the developers of the program

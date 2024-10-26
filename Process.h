@@ -13,6 +13,7 @@ public:
 
     void updateProcessInfo() const;
 	void displayProcessInfo() const;
+    void initProcess();
 
 private:
     String processName;
@@ -22,6 +23,8 @@ private:
     std::vector<String> processContents;
     MainConsole::Config config;
     bool isFinished;
+
+
     
 	void displayProcessHeader() const;
     uint32_t generateRandomNumber();
