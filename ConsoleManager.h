@@ -11,7 +11,6 @@
 
 // Major Screens
 const String MAIN_CONSOLE = "MAIN_CONSOLE";
-const String MARQUEE_CONSOLE = "MARQUEE_CONSOLE";
 
 class ConsoleManager
 {
@@ -22,8 +21,8 @@ public:
 	static void initialize();														// Initialize the instance of ConsoleManager
 	static void destroy();															// Destroy the instance of ConsoleManager
 
-	void drawConsole() const;																// Refreshes the screen with the updated information
-	void process() const;																	// Contains handling of logic and other non-drawing operations
+	void drawConsole() const;														// Refreshes the screen with the updated information
+	void process() const;															// Contains handling of logic and other non-drawing operations
 	void switchConsole(String consoleName);											// Switches to the specified console
 	
 	void registerScreen(std::shared_ptr<BaseScreen> screenRef);						// Registers a screen to the console manager
@@ -38,6 +37,7 @@ public:
 
 	void setCursorPosition(int posX, int posY) const;								// Sets the cursor position to the specified coordinates
 	void printScreenNames() const;
+	bool isScreenRegistered(String screenName) const;								// Checks if the specified screen is registered
 
 private:
 	ConsoleManager();																// Constructor

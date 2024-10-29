@@ -13,7 +13,6 @@ public:
 	void process() override;												// Override the process function of AConsole
 
 private:
-	void printProcessInfo() const;											// Prints the process information
 	std::shared_ptr<Process> attachedProcess;								// The process attached to the screen; class the represents the process; for every base screen, there is a process that contains another set of commands
 	bool refreshed = false;													// The refreshed variable
 };

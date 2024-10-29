@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "MainConsole.h"
-#include "MarqueeConsole.h"
 #include "Scheduler.h"
 
 
@@ -92,13 +91,10 @@ ConsoleManager::ConsoleManager()
 
 	// Initialize the consoles
 	const std::shared_ptr<MainConsole> mainConsole = std::make_shared<MainConsole>();
-	const std::shared_ptr<MarqueeConsole> marqueeConsole = std::make_shared<MarqueeConsole>();
 
 	this->consoleTable[MAIN_CONSOLE] = mainConsole;					// Add the main console to the console table
-	this->consoleTable[MARQUEE_CONSOLE] = marqueeConsole;			// Add the marquee console to the console table
 
 	this->switchConsole(MAIN_CONSOLE);								// Switch to the main console since it is the first console to be displayed; main menu
-	//this->switchConsole(MARQUEE_CONSOLE);							// Switch to the marquee console since it is the first console to be displayed; marquee
 }
 
 
@@ -134,9 +130,7 @@ void ConsoleManager::setCursorPosition(int posX, int posY) const {
 }
 
 void ConsoleManager::printScreenNames() const {
-    if (consoleTable.size() <= 2 &&
-        consoleTable.contains(MAIN_CONSOLE) &&
-        consoleTable.contains(MARQUEE_CONSOLE)) {
+    if (consoleTable.size() <= 1 && consoleTable.contains(MAIN_CONSOLE)) {
         std::cerr << "There are no screens created." << std::endl;
         return;
     }
@@ -144,8 +138,12 @@ void ConsoleManager::printScreenNames() const {
     int count = 0;
 
     for (const auto& entry : consoleTable) {
-        if (entry.first != MAIN_CONSOLE && entry.first != MARQUEE_CONSOLE) {
+        if (entry.first != MAIN_CONSOLE) {
             std::cout << ++count << ": " << entry.first << std::endl;
         }
     }
+}
+
+bool ConsoleManager::isScreenRegistered(String screenName) const {
+	return consoleTable.contains(screenName);
 }

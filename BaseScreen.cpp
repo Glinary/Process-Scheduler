@@ -2,7 +2,6 @@
 #include "TypedefRepo.h"
 #include "Process.h"
 #include "ConsoleManager.h"
-#include "DummyProcessLayout.h"
 #include <iostream>
 #include <format>
 
@@ -14,14 +13,15 @@ void BaseScreen::onEnabled() {
 }
 
 void BaseScreen::display() {
-	/*if (!refreshed) {
-		refreshed = true;
-		std::cout << "Process Name: " << attachedProcess->getName() << std::endl;
-		std::cout << " " << std::endl;
-		printProcessInfo();
-	}*/
-
-	std::cout << "Temporarily displaying the process layout" << std::endl;
+	// if true, display the process information
+	if (refreshed) {
+		attachedProcess->displayProcessInfo();
+		std::cout << "Process has finished." << std::endl;
+	}
+	else {
+		attachedProcess->displayProcessInfo();
+		std::cout << "Process is still running..." << std::endl;
+	}
 }
 
 
@@ -41,7 +41,9 @@ void BaseScreen::process() {
 			break;
 		}
 		if (commandBaseScreen == "process-smi") {
-			attachedProcess->displayProcessInfo();
+			attachedProcess->updateProcessInfo();
+			
+			refreshed = attachedProcess->getIsFinished();
 		}
 		else {
 			std::cout << "Command not recognized. Please try again." << std::endl;

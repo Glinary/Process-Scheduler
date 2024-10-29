@@ -7,7 +7,6 @@
 #include <iomanip>  // for std::quoted
 #include <algorithm> // for transform() - converting string to lowercase
 #include <Windows.h>
-#include "DummyProcessLayout.h"
 
 
 
@@ -109,6 +108,12 @@ void MainConsole::process() {
 				onEnabled();
 			}
 			else if (commandMain.substr(0, 9) == "screen -s" && commandMain.length() > 9) {			// ensure there is process name
+				// Check if the process name is already in the console table
+				if (ConsoleManager::getInstance()->isScreenRegistered(commandMain.substr(10))) {
+					std::cerr << "Error: Process name " << commandMain.substr(10) << " already exists. Please use another name." << std::endl;
+					continue;
+				}
+
 				ConsoleManager::getInstance()->exitApplication();									// Stop the main console process
 				String processName = commandMain.substr(10, commandMain.length() - 10);				// get the process name
 
@@ -118,10 +123,9 @@ void MainConsole::process() {
 
 				Scheduler::getInstance()->scheduleProcess(newProcess);
 				
-
 				// Register the new screen and switch to it
 				ConsoleManager::getInstance()->registerScreen(newScreen);					// Register the new screen
-				ConsoleManager::getInstance()->switchToScreen(processName);					// Switch to the new screen	
+				ConsoleManager::getInstance()->switchToScreen(processName);					// Switch to the new screen
 				ConsoleManager::getInstance()->process();									// Process the new screen
 				ConsoleManager::getInstance()->drawConsole();								// Draw the new screen
 			}
@@ -135,22 +139,50 @@ void MainConsole::process() {
 			}
 			else if (commandMain == "screen -ls") {
 				// List all the screens
-				std::cout << "List of screens: " << std::endl;
-				ConsoleManager::getInstance()->printScreenNames();
+				/*std::cout << "CPU utilization: " << Scheduler::getInstance()->getCPUUtilization() << "%" << std::endl;*/
+				/*std::cout << "Cores used: " << Scheduler::getInstance()->getCoresUsed() << std::endl;*/
 
+				std::cout << "CPU utilization: " << std::endl;
+				std::cout << "Cores used: " << std::endl;
+				std::cout << "Cores available: " << std::endl;
+				std::cout << " " << std::endl;
 
+				std::cout << "______________________________________________________________\n";
+				std::cout << "Running processes: \n";
+				
+				std::cout << " " << std::endl;
 
-				/*for (auto const& screen : ConsoleManager::getInstance()->consoleTable) {
-					std::cout << screen.first << std::endl;
-				}*/
+				std::cout << "Finished processes: \n";
+				std::cout << "______________________________________________________________\n";
+
 			}
-			else if (commandMain == "dummy-layout") {
-				// clear the screen
-				system("cls");
+			else if (commandMain == "scheduler-test") {
+				std::cout << "Testing the scheduler...\n";
+				std::cout << "Generating a batch of dummy processes...\n";
 
-				// display the dummy layout
-				DummyProcessLayout dummyLayout;
-				dummyLayout.onEnabled();
+				uint32_t batchProcessFreq = config.batch_process_freq;
+
+				for (uint32_t i = 0; i < batchProcessFreq; i++) {
+					String processName = "Process" + std::to_string(i);
+					std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName, config);
+					std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	// Create a new screen
+
+					Scheduler::getInstance()->scheduleProcess(newProcess);
+
+					// Register the new screen and switch to it
+					ConsoleManager::getInstance()->registerScreen(newScreen);					// Register the new screen
+				}
+			}
+			else if (commandMain == "scheduler-stop") {
+				std::cout << "Stopping the scheduler...\n";
+				std::cout << "Stops generating dummy processes...\n";
+			}
+			else if (commandMain == "report-util") {
+				std::cout << "Generating CPU utilization report. \n";
+
+				std::cout << "Process Name List: \n";
+				std::cout << " " << std::endl;
+				ConsoleManager::getInstance()->printScreenNames();
 			}
 			else {
 				recognizeCommand(commandMain);
@@ -222,8 +254,7 @@ bool MainConsole::validateCommand(String& input) const {
 
 	String commandList[] = { "initialize", "exit", "clear",
 							"scheduler-test", "scheduler-stop", "report-util",
-							"screen",
-							"dummy-layout" };
+							"screen" };
 
 	// Check if the first word of the input is a valid command
 	String inputCommand = input.substr(0, input.find(" "));

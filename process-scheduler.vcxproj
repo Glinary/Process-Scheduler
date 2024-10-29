@@ -131,21 +131,29 @@
     <ClCompile Include="AConsole.cpp" />
     <ClCompile Include="BaseScreen.cpp" />
     <ClCompile Include="ConsoleManager.cpp" />
-    <ClCompile Include="DummyProcessLayout.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainConsole.cpp" />
-    <ClCompile Include="MarqueeConsole.cpp" />
     <ClCompile Include="Process.cpp" />
+    <ClCompile Include="Scheduler.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AConsole.h" />
     <ClInclude Include="BaseScreen.h" />
     <ClInclude Include="ConsoleManager.h" />
-    <ClInclude Include="DummyProcessLayout.h" />
     <ClInclude Include="MainConsole.h" />
-    <ClInclude Include="MarqueeConsole.h" />
     <ClInclude Include="Process.h" />
+    <ClInclude Include="Scheduler.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="TypedefRepo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="README.md" />
+    <None Include="start.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="config.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

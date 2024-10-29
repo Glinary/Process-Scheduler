@@ -28,12 +28,14 @@ Process::Process(const String& processName, const MainConsole::Config& config)
 
 void Process::displayProcessInfo() const {
 	displayProcessHeader();
-	updateProcessInfo();
 
-    // Display all stored instructions
-    for (const auto& instruction : processContents) {
-        std::cout << instruction << std::endl;
-    }
+    std::cout << "Current Line: " << processCurrentInstructionLine << std::endl;
+    std::cout << "Total Instructions: " << processTotalInstructions << std::endl;
+
+    //// Display all stored instructions
+    //for (const auto& instruction : processContents) {
+    //    std::cout << instruction << std::endl;
+    //}
 }
 
 void Process::initProcess() {
@@ -44,6 +46,7 @@ void Process::initProcess() {
 
         // Store the instruction in the processContents vector
         processContents.push_back(instruction);
+		processCurrentInstructionLine += 1;  // Increment the current instruction line
 
         std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Delay
     }
@@ -53,8 +56,7 @@ void Process::initProcess() {
 
 void Process::updateProcessInfo() const
 {
-    std::cout << "Current Line: " << processCurrentInstructionLine << std::endl;
-    std::cout << "Total Instructions: " << processTotalInstructions << std::endl;
+	std::cout << "Updating process information..." << std::endl;
 }
 
 void Process::displayProcessHeader() const
@@ -77,3 +79,7 @@ uint32_t Process::generateRandomNumber()
 	return dis(gen);
 }
 
+bool Process::getIsFinished() const
+{
+	return isFinished;
+}
