@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "MainConsole.h"
-#include "Scheduler.h"
+// #include "Scheduler.h"
 
 
 
@@ -16,7 +16,6 @@ ConsoleManager* ConsoleManager::getInstance() {							// Singleton pattern; actu
 
 void ConsoleManager::initialize() {
 	sharedInstance = new ConsoleManager();								// Initialize the instance of ConsoleManager
-	Scheduler::initialize();
 }
 
 void ConsoleManager::destroy() {
@@ -146,4 +145,12 @@ void ConsoleManager::printScreenNames() const {
 
 bool ConsoleManager::isScreenRegistered(String screenName) const {
 	return consoleTable.contains(screenName);
+}
+
+std::vector<std::shared_ptr<Process>> ConsoleManager::getProcesses(){
+	return this->processes;
+}
+
+void ConsoleManager::addProcesses(std::shared_ptr<Process> process){
+	this->processes.push_back(process);
 }

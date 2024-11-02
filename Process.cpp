@@ -21,7 +21,7 @@ Process::Process(const String& processName, const MainConsole::Config& config)
     localtime_s(&processCreationTime, &currentTime);
 
     processContents = StringVector();       // Initialize the process contents (instructions)
-    processCurrentInstructionLine = 1;      // Initialize the current instruction line
+    processCurrentInstructionLine = 0;      // Initialize the current instruction line
 	processTotalInstructions = generateRandomNumber();  // Initialize the total instructions
 	isFinished = false;                     // Initialize the process as not finished
 }
@@ -32,10 +32,10 @@ void Process::displayProcessInfo() const {
     std::cout << "Current Line: " << processCurrentInstructionLine << std::endl;
     std::cout << "Total Instructions: " << processTotalInstructions << std::endl;
 
-    //// Display all stored instructions
-    //for (const auto& instruction : processContents) {
-    //    std::cout << instruction << std::endl;
-    //}
+    // Display all stored instructions
+    for (const auto& instruction : processContents) {
+       std::cout << instruction << std::endl;
+    }
 }
 
 void Process::initProcess() {
@@ -50,13 +50,17 @@ void Process::initProcess() {
 
         std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Delay
     }
-
-    std::cout << "TASK FINISHED" << processName << std::endl;
+    isFinished = true;
 }
 
 void Process::updateProcessInfo() const
 {
-	std::cout << "Updating process information..." << std::endl;
+    if (!isFinished) {
+        displayProcessInfo();
+    } else {
+        displayProcessHeader();
+        std::cout << "Finished!" << std::endl;
+    }
 }
 
 void Process::displayProcessHeader() const
@@ -82,4 +86,8 @@ uint32_t Process::generateRandomNumber()
 bool Process::getIsFinished() const
 {
 	return isFinished;
+}
+
+String Process::getName() {
+    return processName;
 }

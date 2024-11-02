@@ -16,6 +16,7 @@ public:
 	void displayProcessInfo() const;
     void initProcess();
     bool getIsFinished() const;
+    String getName();
 
 private:
     String processName;

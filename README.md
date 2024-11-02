@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-# Process-Scheduler
-
-
-## Directory Guide
-1. [HW2 - Setting Up OS Emulator](https://github.com/Glinary/Process-Scheduler/tree/group-hw-week2)
-1. [HW3 - Designing Console Layouts](https://github.com/Glinary/Process-Scheduler/tree/group-hw-week3) 
-1. [Week 6 - FCFS scheduler in OS emulator](https://github.com/Glinary/Process-Scheduler/tree/group-hw-week6)
-=======
 # Process-Scheduler
 
 
@@ -40,4 +31,3 @@ exit
 1. `screen -ls` - List down all screen sessions.
 1. `exit` - Returns to the main menu from a screen session.
 2. `quit` - Stops the program.
->>>>>>> 2191e26edcb8067333b1e7f92d11a3f891091c29

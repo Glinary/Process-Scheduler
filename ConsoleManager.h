@@ -39,6 +39,9 @@ public:
 	void printScreenNames() const;
 	bool isScreenRegistered(String screenName) const;								// Checks if the specified screen is registered
 
+	std::vector<std::shared_ptr<Process>> getProcesses();
+	void addProcesses(std::shared_ptr<Process> process);
+
 private:
 	ConsoleManager();																// Constructor
 	~ConsoleManager() = default;													// Destructor
@@ -49,6 +52,7 @@ private:
 	};						// Assignment operator is private
 	static ConsoleManager* sharedInstance;											// The instance of ConsoleManager
 
+	std::vector<std::shared_ptr<Process>> processes;
 	ConsoleTable consoleTable;														// The table of consoles
 	std::shared_ptr<AConsole> currentConsole;										// The current console
 	std::shared_ptr<AConsole> previousConsole;										// The previous console

@@ -62,7 +62,7 @@ void MainConsole::process() {
 						std::cout << "______________________________________________________________\n";
 
 
-						Scheduler::getInstance()->setCore(config.num_cpu);
+						Scheduler::initialize(config);
 
 						isFirstCommand = false;
 					}
@@ -122,8 +122,9 @@ void MainConsole::process() {
 				std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	// Create a new screen
 
 				Scheduler::getInstance()->scheduleProcess(newProcess);
-				
+
 				// Register the new screen and switch to it
+				ConsoleManager::getInstance()->addProcesses(newProcess);
 				ConsoleManager::getInstance()->registerScreen(newScreen);					// Register the new screen
 				ConsoleManager::getInstance()->switchToScreen(processName);					// Switch to the new screen
 				ConsoleManager::getInstance()->process();									// Process the new screen
@@ -150,9 +151,27 @@ void MainConsole::process() {
 				std::cout << "______________________________________________________________\n";
 				std::cout << "Running processes: \n";
 				
+				for (int i = 0; i < ConsoleManager::getInstance()->getProcesses().size() ; i++){
+					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
+
+					if (!process->getIsFinished()){
+						std::cout << process->getName() << std::endl;
+
+					}
+				}
+				
 				std::cout << " " << std::endl;
 
 				std::cout << "Finished processes: \n";
+				for (int i = 0; i < ConsoleManager::getInstance()->getProcesses().size() ; i++){
+					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
+
+					if (process->getIsFinished()){
+						std::cout << process->getName() << std::endl;
+
+					}
+				}
+				
 				std::cout << "______________________________________________________________\n";
 
 			}
@@ -160,18 +179,8 @@ void MainConsole::process() {
 				std::cout << "Testing the scheduler...\n";
 				std::cout << "Generating a batch of dummy processes...\n";
 
-				uint32_t batchProcessFreq = config.batch_process_freq;
+				Scheduler::getInstance()->setBatch();
 
-				for (uint32_t i = 0; i < batchProcessFreq; i++) {
-					String processName = "Process" + std::to_string(i);
-					std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName, config);
-					std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	// Create a new screen
-
-					Scheduler::getInstance()->scheduleProcess(newProcess);
-
-					// Register the new screen and switch to it
-					ConsoleManager::getInstance()->registerScreen(newScreen);					// Register the new screen
-				}
 			}
 			else if (commandMain == "scheduler-stop") {
 				std::cout << "Stopping the scheduler...\n";
