@@ -16,6 +16,7 @@ public:
 	void displayProcessInfo() const;
     void initProcess(int key);
     bool getIsFinished() const;
+    bool getIsOngoing();
     String getName();
     int getCore();
     void setCore(int core);
@@ -29,9 +30,8 @@ private:
     std::vector<String> processContents;
     MainConsole::Config config;
     bool isFinished;
+    bool isOngoing;
 
-
-    
 	void displayProcessHeader() const;
     uint32_t generateRandomNumber();
 };

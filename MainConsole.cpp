@@ -154,7 +154,7 @@ void MainConsole::process() {
 				for (int i = 0; i < ConsoleManager::getInstance()->getProcesses().size() ; i++){
 					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
 
-					if (!process->getIsFinished()){
+					if (!process->getIsFinished() && process->getIsOngoing()){
 						std::cout << process->getName() << "  " + std::to_string(process->getCore()) << std::endl;
 					}
 				}
@@ -165,7 +165,7 @@ void MainConsole::process() {
 				for (int i = 0; i < ConsoleManager::getInstance()->getProcesses().size() ; i++){
 					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
 
-					if (process->getIsFinished()){
+					if (process->getIsFinished() && !process->getIsOngoing()){
 						std::cout << process->getName() << std::endl;
 
 					}

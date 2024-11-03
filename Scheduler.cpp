@@ -15,10 +15,17 @@ void Scheduler::initialize(const MainConsole::Config& config) {
 }
 
 Scheduler::Scheduler(const MainConsole::Config& config)
-    : isShuttingDown(false), config(config), isBatchProcess(false)
+    : isShuttingDown(false), config(config), isBatchProcess(false), nextKey(0)
 {
     std::thread([this, config = this->config, cycleCounter = this->cycleCounter]() mutable {
-        ThreadPool::initialize(config.num_cpu, config.scheduler, config.quantum_cycles);
+        // ThreadPool::initialize(config.num_cpu, config.scheduler, config.quantum_cycles);
+
+        workers.resize(config.num_cpu);  // Resize the vector to hold the required number of workers
+
+        for (size_t i = 0; i < config.num_cpu; i++) {
+            workers[i].isBusy = false;  // Initialize worker state
+            workers[i].worker = std::thread([this, i] { this->worker(i); });
+        }
         int batchProcessCount = 1;
 
         while (!isShuttingDown) {
@@ -36,6 +43,55 @@ Scheduler::Scheduler(const MainConsole::Config& config)
     }).detach(); // Detach the thread to run independently
 }
 
+void Scheduler::enqueue(std::function<void()> task) {
+    {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        tasks.emplace(std::move(task));  // Add the task to the queue
+    }
+
+    // Notify the specific worker thread associated with this key
+    {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        if (!workers[nextKey].isBusy) {
+            workers[nextKey].cv.notify_one();  // Notify the worker if it's not busy
+        }
+    }
+
+    // Only increment nextKey after successfully adding a task
+    if (!tasks.empty()) {
+        nextKey = (nextKey + 1) % workers.size();  // Loop around available core
+    }
+}
+
+
+void Scheduler::worker(int index) {
+    while (!stop) {
+        std::function<void()> task;  // Declare the task variable
+        {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            while (tasks.empty() || workers[index].isBusy) {
+                workers[index].cv.wait(lock);  // Wait until a task is available and not busy
+            }
+
+            if (!tasks.empty()) {
+                task = std::move(tasks.front());  // Retrieve the task
+                tasks.pop();
+                workers[index].isBusy = true;  // Mark thread as busy
+            }
+        }
+
+        if (task) {
+            task();  // Execute the task
+            // After the task completes, mark the thread as free
+            {
+                std::lock_guard<std::mutex> lock(queueMutex);
+                workers[index].isBusy = false;  // Mark as available
+                workers[index].cv.notify_one();  // Notify any waiting tasks
+            }
+        }
+    }
+}
+
 void Scheduler::generateBatchProcess(const MainConsole::Config& config, int batchProcessCount) {
         String processName = "Process" + std::to_string(batchProcessCount);
 		std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName, config);
@@ -48,30 +104,21 @@ void Scheduler::generateBatchProcess(const MainConsole::Config& config, int batc
 
     }
 
-// setup scheduler
-// void Scheduler::setupScheduler(uint8_t num_cpu, String scheduler, uint32_t quantum_cycles, uint32_t batch_process_freq, uint32_t min_ins, uint32_t max_ins, uint32_t delays_per_exec) {
-//     this->num_cpu = num_cpu;
-//     this->scheduler = scheduler; 
-//     this->quantum_cycles = quantum_cycles; 
-//     this->batch_process_freq = batch_process_freq; 
-//     this-> min_ins = min_ins;
-//     this-> max_ins = max_ins;
-//     this-> delays_per_exec = delays_per_exec;
-
-//     threadPool = std::make_unique<ThreadPool>(num_cpu);
-// }
-
 void Scheduler::setBatch(bool status){
     this->isBatchProcess = status;
+}
+
+int Scheduler::getNextKey() {
+    return nextKey;
 }
 
 // Schedule a process
 void Scheduler::scheduleProcess(const std::shared_ptr<Process>& process) {
 
-    int nextKey = ThreadPool::getInstance()->getNextKey();
+    int nextK = nextKey;
     std::cout << nextKey << std::endl; 
-    ThreadPool::getInstance()->enqueue([process, nextKey]() {
-        process->initProcess(nextKey);  // Run the process's initialization
+    enqueue([process, nextK]() {
+        process->initProcess(nextK);  // Run the process's initialization
     });
 }
 
