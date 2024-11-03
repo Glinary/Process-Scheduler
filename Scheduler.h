@@ -11,7 +11,7 @@
 #include <functional>
 #include <condition_variable>
 #include <atomic>
-// #include "ThreadPool.h"
+
 
 class Scheduler {
 public:
@@ -30,7 +30,7 @@ public:
 private:
     MainConsole::Config config;
 
-    Scheduler(const MainConsole::Config& config);																// Constructor
+    Scheduler(const MainConsole::Config& config);			// Constructor
 	~Scheduler() = default;
     
     static Scheduler* sched;											

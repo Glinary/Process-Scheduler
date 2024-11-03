@@ -2,7 +2,6 @@
 #include "ConsoleManager.h"
 
 
-
 Scheduler* Scheduler::sched = nullptr;				
 
 Scheduler* Scheduler::getInstance() {
@@ -18,7 +17,6 @@ Scheduler::Scheduler(const MainConsole::Config& config)
     : isShuttingDown(false), config(config), isBatchProcess(false), nextKey(0)
 {
     std::thread([this, config = this->config, cycleCounter = this->cycleCounter]() mutable {
-        // ThreadPool::initialize(config.num_cpu, config.scheduler, config.quantum_cycles);
 
         workers.resize(config.num_cpu);  // Resize the vector to hold the required number of workers
 
@@ -40,7 +38,7 @@ Scheduler::Scheduler(const MainConsole::Config& config)
             cycleCounter++;
 
         }
-    }).detach(); // Detach the thread to run independently
+    }).detach(); 
 }
 
 void Scheduler::enqueue(std::function<void()> task) {
@@ -49,15 +47,13 @@ void Scheduler::enqueue(std::function<void()> task) {
         tasks.emplace(std::move(task));  // Add the task to the queue
     }
 
-    // Notify the specific worker thread associated with this key
     {
         std::lock_guard<std::mutex> lock(queueMutex);
         if (!workers[nextKey].isBusy) {
-            workers[nextKey].cv.notify_one();  // Notify the worker if it's not busy
+            workers[nextKey].cv.notify_one();  
         }
     }
 
-    // Only increment nextKey after successfully adding a task
     if (!tasks.empty()) {
         nextKey = (nextKey + 1) % workers.size();  // Loop around available core
     }
@@ -66,27 +62,28 @@ void Scheduler::enqueue(std::function<void()> task) {
 
 void Scheduler::worker(int index) {
     while (!stop) {
-        std::function<void()> task;  // Declare the task variable
+        std::function<void()> task; 
         {
             std::unique_lock<std::mutex> lock(queueMutex);
             while (tasks.empty() || workers[index].isBusy) {
-                workers[index].cv.wait(lock);  // Wait until a task is available and not busy
+                workers[index].cv.wait(lock);  
             }
 
             if (!tasks.empty()) {
-                task = std::move(tasks.front());  // Retrieve the task
+                task = std::move(tasks.front());  
                 tasks.pop();
-                workers[index].isBusy = true;  // Mark thread as busy
+                workers[index].isBusy = true;                       // occupy thread
             }
         }
 
         if (task) {
             task();  // Execute the task
-            // After the task completes, mark the thread as free
+
+            // free up thread
             {
                 std::lock_guard<std::mutex> lock(queueMutex);
-                workers[index].isBusy = false;  // Mark as available
-                workers[index].cv.notify_one();  // Notify any waiting tasks
+                workers[index].isBusy = false;  
+                workers[index].cv.notify_one();                         // next task, if waiting
             }
         }
     }
