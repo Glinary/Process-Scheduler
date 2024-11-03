@@ -1,61 +1,91 @@
-#include <thread>
-#include <vector>
-#include <queue>
-#include <functional>
-#include <condition_variable>
-#include <atomic>
+#include "ThreadPool.h"
+#include "Scheduler.h"
 
-class ThreadPool {
-public:
-    ThreadPool(size_t numThreads);
-    ~ThreadPool();
+ThreadPool* ThreadPool::threadpool = nullptr;				
 
-    void enqueue(std::function<void()> task);
+ThreadPool* ThreadPool::getInstance() {
+    return threadpool;
+}
 
-private:
-    std::vector<std::thread> workers;
-    std::queue<std::function<void()>> tasks;
-    std::mutex queueMutex;
-    std::condition_variable condition;
-    std::atomic<bool> stop;
+void ThreadPool::initialize(uint8_t num_cpu, std::string scheduler, uint32_t quantum_cycles) {
+    threadpool = new ThreadPool(num_cpu, scheduler, quantum_cycles);
+}
 
-    void worker();
-};
+ThreadPool::ThreadPool() 
+    : stop(false), num_cpu(0), scheduler("fcfs"), quantum_cycles(0), nextKey(0) {
+}
 
-ThreadPool::ThreadPool(size_t numThreads) : stop(false) {
-    for (size_t i = 0; i < numThreads; ++i) {
-        workers.emplace_back([this] { this->worker(); });
+ThreadPool::ThreadPool(uint8_t num_cpu, std::string scheduler, uint32_t quantum_cycles) 
+    : stop(false), num_cpu(num_cpu), scheduler(scheduler), quantum_cycles(quantum_cycles), nextKey(0) {
+    workers.resize(num_cpu);  // Resize the vector to hold the required number of workers
+
+    for (size_t i = 0; i < num_cpu; i++) {
+        workers[i].isBusy = false;  // Initialize worker state
+        workers[i].worker = std::thread([this, i] { this->worker(i); });
     }
 }
 
+
 ThreadPool::~ThreadPool() {
     stop = true;
-    condition.notify_all();
-    for (std::thread &worker : workers) {
-        worker.join();
+    for (size_t i = 0; i < workers.size(); ++i) {
+        workers[i].cv.notify_all();  // Wake up all threads
+    }
+    for (auto &worker : workers) {
+        if (worker.worker.joinable()) {
+            worker.worker.join();  // Wait for all threads to finish
+        }
     }
 }
 
 void ThreadPool::enqueue(std::function<void()> task) {
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        tasks.emplace(std::move(task));
+        tasks.emplace(std::move(task));  // Add the task to the queue
     }
-    condition.notify_one();
+
+    // Notify the specific worker thread associated with this key
+    {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        if (!workers[nextKey].isBusy) {
+            workers[nextKey].cv.notify_one();  // Notify the worker if it's not busy
+        }
+    }
+
+    // Only increment nextKey after successfully adding a task
+    if (!tasks.empty()) {
+        nextKey = (nextKey + 1) % workers.size();  // Loop around available core
+    }
 }
 
-void ThreadPool::worker() {
+void ThreadPool::worker(int index) {
     while (!stop) {
-        std::function<void()> task;
+        std::function<void()> task;  // Declare the task variable
         {
             std::unique_lock<std::mutex> lock(queueMutex);
-            condition.wait(lock, [this] { return stop || !tasks.empty(); });
-            if (stop && tasks.empty())
-                return;
+            while (tasks.empty() || workers[index].isBusy) {
+                workers[index].cv.wait(lock);  // Wait until a task is available and not busy
+            }
 
-            task = std::move(tasks.front());
-            tasks.pop();
+            if (!tasks.empty()) {
+                task = std::move(tasks.front());  // Retrieve the task
+                tasks.pop();
+                workers[index].isBusy = true;  // Mark thread as busy
+            }
         }
-        task();  // Execute the task
+
+        if (task) {
+            task();  // Execute the task
+            // After the task completes, mark the thread as free
+            {
+                std::lock_guard<std::mutex> lock(queueMutex);
+                workers[index].isBusy = false;  // Mark as available
+                workers[index].cv.notify_one();  // Notify any waiting tasks
+            }
+        }
     }
+}
+
+int ThreadPool::getNextKey() {
+    return nextKey;
 }

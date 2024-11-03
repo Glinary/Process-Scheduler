@@ -14,11 +14,14 @@ public:
 
     void updateProcessInfo() const;
 	void displayProcessInfo() const;
-    void initProcess();
+    void initProcess(int key);
     bool getIsFinished() const;
     String getName();
+    int getCore();
+    void setCore(int core);
 
 private:
+    int coreNum;
     String processName;
     uint32_t processCurrentInstructionLine;
 	uint32_t processTotalInstructions;

@@ -27,7 +27,6 @@ public:
 	Config getConfig() const;							// Returns the config
 
 private:
-
 	Config config;										// Config variable to hold the values of the config.txt
 	void ASCIITextHeader() const;						// Prints the ASCII text header
 	void displayDevelopers() const;						// Displays the developers of the program

@@ -1,7 +1,9 @@
 #include "Scheduler.h"
+#include "ConsoleManager.h"
 
 
-Scheduler* Scheduler::sched = nullptr;				// Initialize the instance of ConsoleManager
+
+Scheduler* Scheduler::sched = nullptr;				
 
 Scheduler* Scheduler::getInstance() {
     return sched;
@@ -16,23 +18,17 @@ Scheduler::Scheduler(const MainConsole::Config& config)
     : isShuttingDown(false), config(config), isBatchProcess(false)
 {
     std::thread([this, config = this->config, cycleCounter = this->cycleCounter]() mutable {
-        threadPool = std::make_unique<ThreadPool>(config.num_cpu);
+        ThreadPool::initialize(config.num_cpu, config.scheduler, config.quantum_cycles);
         int batchProcessCount = 1;
-
 
         while (!isShuttingDown) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
             if (cycleCounter % config.batch_process_freq == 0 && isBatchProcess) {
 
-                if (batchProcessCount == 50){
-                    isBatchProcess = false;
-                }
-
-                // std:: cout << cycleCounter << std::endl;
                 generateBatchProcess(config, batchProcessCount); 
                 batchProcessCount++;
-            }
+            }         
 
             cycleCounter++;
 
@@ -42,9 +38,8 @@ Scheduler::Scheduler(const MainConsole::Config& config)
 
 void Scheduler::generateBatchProcess(const MainConsole::Config& config, int batchProcessCount) {
         String processName = "Process" + std::to_string(batchProcessCount);
-        // std:: cout << processName << std::endl;
 		std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName, config);
-        std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	// Create a new screen
+        std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	
 
         scheduleProcess(newProcess);
 
@@ -66,15 +61,17 @@ void Scheduler::generateBatchProcess(const MainConsole::Config& config, int batc
 //     threadPool = std::make_unique<ThreadPool>(num_cpu);
 // }
 
-void Scheduler::setBatch(){
-    this->isBatchProcess = true;
+void Scheduler::setBatch(bool status){
+    this->isBatchProcess = status;
 }
 
 // Schedule a process
 void Scheduler::scheduleProcess(const std::shared_ptr<Process>& process) {
 
-    threadPool->enqueue([process]() {
-        process->initProcess();  // Run the process's initialization
+    int nextKey = ThreadPool::getInstance()->getNextKey();
+    std::cout << nextKey << std::endl; 
+    ThreadPool::getInstance()->enqueue([process, nextKey]() {
+        process->initProcess(nextKey);  // Run the process's initialization
     });
 }
 

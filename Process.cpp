@@ -38,7 +38,7 @@ void Process::displayProcessInfo() const {
     }
 }
 
-void Process::initProcess() {
+void Process::initProcess(int key) {
     for (int i = 0; i < 50; ++i) {
         std::stringstream ss;
         ss << "Instruction # " << (i + 1) << " for process: " << processName;
@@ -51,6 +51,8 @@ void Process::initProcess() {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Delay
     }
     isFinished = true;
+    coreNum = key;
+
 }
 
 void Process::updateProcessInfo() const
@@ -59,7 +61,7 @@ void Process::updateProcessInfo() const
         displayProcessInfo();
     } else {
         displayProcessHeader();
-        std::cout << "Finished!" << std::endl;
+        std::cout << "Finished! by " + std::to_string(coreNum) << std::endl;
     }
 }
 
@@ -90,4 +92,12 @@ bool Process::getIsFinished() const
 
 String Process::getName() {
     return processName;
+}
+
+int Process::getCore() {
+    return coreNum;
+}
+
+void Process::setCore(int core){
+    coreNum = core;
 }
