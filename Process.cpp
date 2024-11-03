@@ -10,6 +10,7 @@
 #include <random>
 #include <chrono> // Include chrono for timestamp
 #include <thread>
+#include "Scheduler.h"
 
 Process::Process(const String& processName, const MainConsole::Config& config)
     : processName(processName), config(config) {
@@ -25,6 +26,7 @@ Process::Process(const String& processName, const MainConsole::Config& config)
 	processTotalInstructions = generateRandomNumber();  // Initialize the total instructions
 	isFinished = false;                     // Initialize the process as not finished
     coreNum = 0;
+    timeFinished = 0;
 }
 
 void Process::displayProcessInfo() const {
@@ -40,21 +42,42 @@ void Process::displayProcessInfo() const {
 }
 
 void Process::initProcess(int key) {
-    coreNum = key;
-    for (int i = 0; i < 50; ++i) {
-        isOngoing = true;
-        std::stringstream ss;
-        ss << "Instruction # " << (i + 1) << " for process: " << processName;
-        String instruction = ss.str();  // Capture the instruction as a string
+    coreNum = key;                      // assign core number
+    int i = 0;
+    int cycle = 0;
 
-        // Store the instruction in the processContents vector
-        processContents.push_back(instruction);
-		processCurrentInstructionLine += 1;  // Increment the current instruction line
+    isOngoing = true;
+    while (processCurrentInstructionLine < 50) {
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Delay
+        if (config.delays_per_exec == 0) {
+            cycle = Scheduler::getInstance()->getCycle();
+            String instruction = "Instruction #" + std::to_string(i+1) + "for " + processName + std::to_string(cycle);
+
+            // Store the instruction in the processContents vector
+            processContents.push_back(instruction);
+            processCurrentInstructionLine += 1;
+            i++;
+        }
+        else {
+            
+            if (Scheduler::getInstance()->getCycle() % config.delays_per_exec == 0){
+                cycle = Scheduler::getInstance()->getCycle();
+                String instruction = "Instruction #" + std::to_string(i+1) + "for " + processName + std::to_string(cycle);
+
+                // Store the instruction in the processContents vector
+                processContents.push_back(instruction);
+                processCurrentInstructionLine += 1;
+                i++;
+            }
+        }
     }
+    timeFinished = cycle;
     isFinished = true;
-    isOngoing = false;
+    isOngoing = false; 
+}
+
+void Process::DisplayUpdate() {
+    std::cout << processName + "   " + std::to_string(coreNum)  << std::endl;
 }
 
 void Process::updateProcessInfo() const
@@ -63,7 +86,7 @@ void Process::updateProcessInfo() const
         displayProcessInfo();
     } else {
         displayProcessHeader();
-        std::cout << "Finished! by " + std::to_string(coreNum) << std::endl;
+        std::cout << "Finished! by " + std::to_string(timeFinished) << std::endl;
     }
 }
 
@@ -101,8 +124,8 @@ String Process::getName() {
     return processName;
 }
 
-int Process::getCore() {
-    return coreNum;
+int Process::getTimeFinished() {
+    return timeFinished;
 }
 
 void Process::setCore(int core){

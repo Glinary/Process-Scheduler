@@ -15,10 +15,12 @@ public:
     void updateProcessInfo() const;
 	void displayProcessInfo() const;
     void initProcess(int key);
+
+    void DisplayUpdate();
     bool getIsFinished() const;
     bool getIsOngoing();
     String getName();
-    int getCore();
+    int getTimeFinished();
     void setCore(int core);
 
 private:
@@ -31,6 +33,7 @@ private:
     MainConsole::Config config;
     bool isFinished;
     bool isOngoing;
+    int timeFinished;
 
 	void displayProcessHeader() const;
     uint32_t generateRandomNumber();

@@ -16,7 +16,7 @@ void Scheduler::initialize(const MainConsole::Config& config) {
 Scheduler::Scheduler(const MainConsole::Config& config)
     : isShuttingDown(false), config(config), isBatchProcess(false), nextKey(0)
 {
-    std::thread([this, config = this->config, cycleCounter = this->cycleCounter]() mutable {
+    std::thread([this, config = this->config]() mutable {
 
         workers.resize(config.num_cpu);  // Resize the vector to hold the required number of workers
 
@@ -109,11 +109,16 @@ int Scheduler::getNextKey() {
     return nextKey;
 }
 
+int Scheduler::getCycle() {
+    return cycleCounter;
+}
+
+
 // Schedule a process
 void Scheduler::scheduleProcess(const std::shared_ptr<Process>& process) {
 
     int nextK = nextKey;
-    std::cout << nextKey << std::endl; 
+    // std::cout << nextKey << std::endl; 
     enqueue([process, nextK]() {
         process->initProcess(nextK);  // Run the process's initialization
     });

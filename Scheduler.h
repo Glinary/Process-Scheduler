@@ -20,13 +20,11 @@ public:
     static void initialize(const MainConsole::Config& config);	
 
     void scheduleProcess(const std::shared_ptr<Process>& process);
+    int getCycle();
     void setBatch(bool status);
     void shutdown(); 
 
-    void enqueue(std::function<void()> task);
-    int getNextKey();
     
-
 private:
     MainConsole::Config config;
 
@@ -36,14 +34,14 @@ private:
     static Scheduler* sched;											
  
     void generateBatchProcess(const MainConsole::Config& config, int i); 
-    void processThread(int coreID); 
+    void enqueue(std::function<void()> task);
+    int getNextKey();
 
-    // ThreadPool threadPool;
     bool isShuttingDown = false;
     int cycleCounter = 0;                                  // Counter for CPU cycles
     bool isBatchProcess;
 
-       struct ThreadInfo {
+    struct ThreadInfo {
         std::thread worker;
         std::atomic<bool> isBusy;
         std::condition_variable cv;
