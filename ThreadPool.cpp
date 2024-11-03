@@ -1,5 +1,4 @@
 #include "ThreadPool.h"
-#include "Scheduler.h"
 
 ThreadPool* ThreadPool::threadpool = nullptr;				
 
