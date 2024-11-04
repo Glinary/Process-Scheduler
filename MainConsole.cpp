@@ -6,25 +6,21 @@
 #include <sstream>
 #include <iomanip>  // for std::quoted
 #include <algorithm> // for transform() - converting string to lowercase
+
+#ifdef _WIN32
 #include <Windows.h>
+#else
+#include <unistd.h>
+#endif
 
-
-
-
-// Constructor: Set the name of the console when MainConsole is instantiated
 MainConsole::MainConsole() : AConsole("MainConsole") {}
 
-// Override of onEnabled: This is called when the screen is shown for the first time
 void MainConsole::onEnabled() {
 	ASCIITextHeader();
 }
 
-// Override of display: Called to draw the screen each frame
-void MainConsole::display() {
-	// ASCIITextHeader();
-}
+void MainConsole::display() {}
 
-// Override of process: Handle input commands or other processes here
 void MainConsole::process() {
 	String commandMain;
 	bool isFirstCommand = true;
@@ -34,24 +30,20 @@ void MainConsole::process() {
 		std::cout << "Enter a command: ";
 		std::getline(std::cin, commandMain);
 
-		// Check if the first command is valid
 		if (isFirstCommand) {
 			isValidCommand = isValidFirstCommand(commandMain);
-			
 			if (!isValidCommand) {
 				std::cerr << "Error: Please initialize the program first. Type command \"initialize\"\n" << std::endl;
-				continue; // Re-prompt for the command without displaying the header
-			}
-			else {
+				continue;
+			} else {
 				if (commandMain == "initialize") {
 					std::cout << "Initializing the program...\n" << std::endl;
 					String filename = "config.txt";
 
 					if (!loadConfigFile(filename)) {
 						std::cerr << "Error: Unable to load config.txt. Please try again." << std::endl;
-					}
-					else {
-						std::cout << "Program initialized." << std::endl;
+					} else {
+						std::cout << "Program initialized.\n";
 						std::cout << "Number of CPUs: " << static_cast<int>(config.num_cpu) << std::endl;
 						std::cout << "Scheduler: " << config.scheduler << std::endl;
 						std::cout << "Quantum Cycles: " << config.quantum_cycles << std::endl;
@@ -61,374 +53,257 @@ void MainConsole::process() {
 						std::cout << "Delays per Execution: " << config.delays_per_exec << std::endl;
 						std::cout << "______________________________________________________________\n";
 
-
 						Scheduler::initialize(config);
-
 						isFirstCommand = false;
 					}
-					
 					continue;
-				}
-				else if (commandMain == "exit") {
+				} else if (commandMain == "exit") {
 					ConsoleManager::getInstance()->exitApplication();
 					exit(0);
 				}
 			}
-		}	// If first command end
-		
-		// Process the commands after the first command or initializing the program
+		}
+
 		if (!isFirstCommand) {
 			isValidCommand = validateCommand(commandMain);
-
 			if (!isValidCommand) {
-				if (commandMain.substr(0, 9) == "screen -s" && commandMain.length() <= 9) {
-					std::cerr << "Error: No process name provided. Please try again." << std::endl;
-				}
-				else if (commandMain.substr(0, 9) == "screen -r" && commandMain.length() <= 9) {
-					/*std::cerr << "Error: You are in Main Screen. There is no previous screen. Please try again." << std::endl;*/
-					std::cerr << "Error: No process name provided. Please try again." << std::endl;
-				}
-				else {
-					std::cout << commandMain << " command not recognized. Please try again." << std::endl;
-				}
-				continue; // Re-prompt for the command without displaying the header
+				std::cerr << commandMain << " command not recognized. Please try again." << std::endl;
+				continue;
 			}
 
-			// If the command is recognized
 			if (commandMain == "initialize") {
 				std::cout << "Program already initialized.\n" << std::endl;
 				continue;
-			}
-			else if (commandMain == "exit") {
+			} else if (commandMain == "exit") {
 				ConsoleManager::getInstance()->exitApplication();
 				exit(0);
-			}
-			else if (commandMain == "clear") {
+			} else if (commandMain == "clear") {
+				#ifdef _WIN32
 				system("cls");
+				#else
+				system("clear");
+				#endif
 				onEnabled();
-			}
-			else if (commandMain.substr(0, 9) == "screen -s" && commandMain.length() > 9) {			// ensure there is process name
-				// Check if the process name is already in the console table
+			} else if (commandMain.substr(0, 9) == "screen -s" && commandMain.length() > 9) {
 				if (ConsoleManager::getInstance()->isScreenRegistered(commandMain.substr(10))) {
 					std::cerr << "Error: Process name " << commandMain.substr(10) << " already exists. Please use another name." << std::endl;
 					continue;
 				}
-
-				ConsoleManager::getInstance()->exitApplication();									// Stop the main console process
-				String processName = commandMain.substr(10, commandMain.length() - 10);				// get the process name
-
-				// Create a new process and attach it to a new screen
+				ConsoleManager::getInstance()->exitApplication();
+				String processName = commandMain.substr(10);
 				std::shared_ptr<Process> newProcess = std::make_shared<Process>(processName, config);
-				std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);	// Create a new screen
+				std::shared_ptr<BaseScreen> newScreen = std::make_shared<BaseScreen>(newProcess, processName);
 
 				Scheduler::getInstance()->scheduleProcess(newProcess);
 
-				// Register the new screen and switch to it
 				ConsoleManager::getInstance()->addProcesses(newProcess);
-				ConsoleManager::getInstance()->registerScreen(newScreen);					// Register the new screen
-				ConsoleManager::getInstance()->switchToScreen(processName);					// Switch to the new screen
-				ConsoleManager::getInstance()->process();									// Process the new screen
-				ConsoleManager::getInstance()->drawConsole();								// Draw the new screen
-			}
-			else if (commandMain.substr(0, 9) == "screen -r") {
-				ConsoleManager::getInstance()->exitApplication();					// Stop the main console process
-				String processName = commandMain.substr(10);						// Get the process name
-
-				ConsoleManager::getInstance()->switchToScreen(processName);			// Switch to the previous screen
-				ConsoleManager::getInstance()->process();							// Process the previous screen
-				ConsoleManager::getInstance()->drawConsole();						// Draw the previous screen
-			}
-			else if (commandMain == "screen -ls") {
-				// List all the screens
-				/*std::cout << "CPU utilization: " << Scheduler::getInstance()->getCPUUtilization() << "%" << std::endl;*/
-				/*std::cout << "Cores used: " << Scheduler::getInstance()->getCoresUsed() << std::endl;*/
-
+				ConsoleManager::getInstance()->registerScreen(newScreen);
+				ConsoleManager::getInstance()->switchToScreen(processName);
+				ConsoleManager::getInstance()->process();
+				ConsoleManager::getInstance()->drawConsole();
+			} else if (commandMain.substr(0, 9) == "screen -r") {
+				ConsoleManager::getInstance()->exitApplication();
+				String processName = commandMain.substr(10);
+				ConsoleManager::getInstance()->switchToScreen(processName);
+				ConsoleManager::getInstance()->process();
+				ConsoleManager::getInstance()->drawConsole();
+			} else if (commandMain == "screen -ls") {
 				std::cout << "CPU utilization: " << std::endl;
 				std::cout << "Cores used: " << std::endl;
 				std::cout << "Cores available: " << std::endl;
-				std::cout << " " << std::endl;
-
 				std::cout << "______________________________________________________________\n";
 				std::cout << "Running processes: \n";
-				
-				for (int i = 0; i < ConsoleManager::getInstance()->getProcesses().size() ; i++){
-					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
-
-					if (!process->getIsFinished() && process->getIsOngoing()){
+				for (const auto& process : ConsoleManager::getInstance()->getProcesses()) {
+					if (!process->getIsFinished() && process->getIsOngoing()) {
 						std::cout << process->getName() << std::endl;
-
 					}
 				}
-				
-				std::cout << " " << std::endl;
-
-				std::cout << "Finished processes: \n";
-				for (int i = 0; i < ConsoleManager::getInstance()->getProcesses().size() ; i++){
-					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
-
-					if (process->getIsFinished()  && !process->getIsOngoing()){
+				std::cout << "\nFinished processes: \n";
+				for (const auto& process : ConsoleManager::getInstance()->getProcesses()) {
+					if (process->getIsFinished() && !process->getIsOngoing()) {
 						std::cout << process->getName() << std::endl;
-
 					}
 				}
-				
 				std::cout << "______________________________________________________________\n";
-
-			}
-			else if (commandMain == "scheduler-test") {
+			} else if (commandMain == "scheduler-test") {
 				std::cout << "Testing the scheduler...\n";
-				std::cout << "Generating a batch of dummy processes...\n";
-
 				Scheduler::getInstance()->setBatch(true);
-
-			}
-			else if (commandMain == "scheduler-stop") {
+			} else if (commandMain == "scheduler-stop") {
 				std::cout << "Stopping the scheduler...\n";
-				std::cout << "Stops generating dummy processes...\n";
 				Scheduler::getInstance()->setBatch(false);
-			}
-			else if (commandMain == "report-util") {
-				std::cout << "Generating CPU utilization report. \n";
-
-				std::cout << "Process Name List: \n";
-				std::cout << " " << std::endl;
+			} else if (commandMain == "report-util") {
+				std::cout << "Generating CPU utilization report.\n";
 				ConsoleManager::getInstance()->printScreenNames();
-			}
-			else {
+			} else {
 				recognizeCommand(commandMain);
-				continue;
 			}
-		}	// If not first command end
-	}	// Main loop end
-}	// Process end
-
+		}
+	}
+}
 
 void MainConsole::ASCIITextHeader() const {
-	std::cout << "  ____    ____      ___     ____    _______    ____    __   __		\n";
-	std::cout << " / ___|  / ___|    / _ \\   |  _ \\   |  ___|   / ___|   \\ \\ / /	\n";
-	std::cout << "| |      \\___ \\   | | | |  | |_) |  |  __|    \\___ \\    \\ V /	\n";
-	std::cout << "| |___    ___) |  | |_| |  |  __/   | |___     ___) |    | |			\n";
-	std::cout << " \\____|  |____/    \\___/   |_|      |_____|   |____/     |_|		\n";
+	std::cout << "  ____    ____      ___     ____    _______    ____    __   __\n";
+	std::cout << " / ___|  / ___|    / _ \\   |  _ \\   |  ___|   / ___|   \\ \\ / /\n";
+	std::cout << "| |      \\___ \\   | | | |  | |_) |  |  __|    \\___ \\    \\ V /\n";
+	std::cout << "| |___    ___) |  | |_| |  |  __/   | |___     ___) |    | |\n";
+	std::cout << " \\____|  |____/    \\___/   |_|      |_____|   |____/     |_| \n";
 
 	std::cout << "______________________________________________________________\n";
 
+	#ifdef _WIN32
 	HANDLE console_color = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(console_color, 10);
-	std::cout << "Welcome to CSOPESY Emulator!\n";
-	std::cout << "\n";
+	std::cout << "Welcome to CSOPESY Emulator!\n\n";
+	SetConsoleTextAttribute(console_color, 15);
+	#else
+	std::cout << "\033[1;32mWelcome to CSOPESY Emulator!\033[0m\n\n";
+	#endif
 
 	displayDevelopers();
 	std::cout << "______________________________________________________________\n";
-
-	SetConsoleTextAttribute(console_color, 14);
-	std::cout << "Type 'exit' to quit, 'clear' to clear the screen\n";
-	SetConsoleTextAttribute(console_color, 15);
 }
 
-
 void MainConsole::displayDevelopers() const {
+	#ifdef _WIN32
 	HANDLE console_color = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(console_color, 15);
+	#endif
 
 	std::cout << "Developers: \n";
 	std::cout << "1. Abenoja, Amelia Joyce L. \n";
 	std::cout << "2. Cuales, Bianca Mari A. \n";
 	std::cout << "3. Culala, Mary Erika L. \n";
-	std::cout << "4. Uy,Gleezell Vina A. \n";
+	std::cout << "4. Uy, Gleezell Vina A. \n";
 	std::cout << "\n";
 	std::cout << "Last Updated: 10-24-2024\n";
 }
 
 bool MainConsole::isValidFirstCommand(String command) const {
-	bool isValid = false;
-
 	String commandList[] = { "initialize", "exit" };
-
-	// Check if the first word of the input is a valid first command
 	String inputCommand = command.substr(0, command.find(" "));
 	std::transform(inputCommand.begin(), inputCommand.end(), inputCommand.begin(), ::tolower);
 
 	for (String command : commandList) {
 		if (inputCommand == command) {
-			isValid = true;
-			break;
+			return true;
 		}
 	}
-
-	return isValid;
+	return false;
 }
 
-
 bool MainConsole::validateCommand(String& input) const {
-	bool isValid = false;
-
-	String commandList[] = { "initialize", "exit", "clear",
-							"scheduler-test", "scheduler-stop", "report-util",
-							"screen" };
-
-	// Check if the first word of the input is a valid command
+	String commandList[] = { "initialize", "exit", "clear", "scheduler-test", "scheduler-stop", "report-util", "screen" };
 	String inputCommand = input.substr(0, input.find(" "));
 	std::transform(inputCommand.begin(), inputCommand.end(), inputCommand.begin(), ::tolower);
 
 	for (String command : commandList) {
 		if (inputCommand == command) {
-			if (command == "screen") {
-				if (isValidScreenCommand(input)) {
-					isValid = true;
-					break;
-				}
+			if (command == "screen" && !isValidScreenCommand(input)) {
+				return false;
 			}
-			else {
-				isValid = true;
-				break;
-			}
+			return true;
 		}
 	}
-
-
-	return isValid;
+	return false;
 }
 
 bool MainConsole::isValidScreenCommand(String command) const {
-	bool isValid = false;
-
 	String screenCommandList[] = { "screen -s", "screen -ls", "screen -r" };
-
 	for (String screenCommand : screenCommandList) {
-		if (command.substr(0, 9) == screenCommand) {
-			// Check if the command has process name after the screen command
-			if (command.length() > 9) {
-				isValid = true;
-				break;
+		if (command.substr(0, screenCommand.size()) == screenCommand) {
+			if (command.size() > screenCommand.size()) {
+				return true;
 			}
 		}
-		else if (command.substr(0, 10) == screenCommand) {
-			isValid = true;
-			break;
-		}
 	}
-
-	return isValid;
+	return false;
 }
-
 
 void MainConsole::recognizeCommand(String command) const {
 	std::cout << command << " command recognized. Doing something...\n";
 }
 
 bool MainConsole::loadConfigFile(String& filename) {
-	bool isLoaded = false;
-
-	try {
-		// read the config.txt
-		std::ifstream configFile(filename);
-		if (!configFile.is_open()) {
-			throw std::runtime_error("Error: config.txt not found.");
-		}
-		else {
-			std::string line;
-			while (std::getline(configFile, line)) {
-				//std::cout << line << std::endl;
-				if (!parseConfigFile(line)) {
-					std::cerr << "Error: Invalid configuration file." << std::endl;
-					configFile.close();
-					break;
-				}
-			}
-
-			configFile.close();
-			isLoaded = true;
+	std::ifstream configFile(filename);
+	if (!configFile.is_open()) {
+		std::cerr << "Error: config.txt not found.\n";
+		return false;
+	}
+	std::string line;
+	while (std::getline(configFile, line)) {
+		if (!parseConfigFile(line)) {
+			std::cerr << "Error: Invalid configuration file.\n";
+			return false;
 		}
 	}
-	catch (std::exception& e) {
-		std::cerr << e.what() << std::endl;
-	}
-
-	return isLoaded;
+	configFile.close();
+	return true;
 }
 
 bool MainConsole::parseConfigFile(String& line) {
 	std::istringstream iss(line);
 	String key;
 
-	if (!(iss >> key)) {
-		return false; // Empty line
-	}
+	if (!(iss >> key)) return false;
 
 	try {
 		if (key == "num-cpu") {
 			int value;
 			if (iss >> value && value >= 1 && value <= 128) {
 				config.num_cpu = static_cast<uint8_t>(value);
-			}
-			else {
+			} else {
 				throw std::invalid_argument("num-cpu must be between 1 and 128");
 			}
-		}
-		else if (key == "scheduler") {
+		} else if (key == "scheduler") {
 			String value;
-			iss >> std::quoted(value); // Handles quoted strings
+			iss >> std::quoted(value);
 			if (value == "rr" || value == "fcfs") {
 				config.scheduler = value;
-			}
-			else {
+			} else {
 				throw std::invalid_argument("scheduler must be \"rr\" or \"fcfs\"");
 			}
-		}
-		else if (key == "quantum-cycles") {
+		} else if (key == "quantum-cycles") {
 			uint32_t value;
 			if (iss >> value && value >= 1) {
 				config.quantum_cycles = value;
-			}
-			else {
+			} else {
 				throw std::invalid_argument("quantum-cycles must be >= 1");
 			}
-		}
-		else if (key == "batch-process-freq") {
+		} else if (key == "batch-process-freq") {
 			uint32_t value;
 			if (iss >> value && value >= 1) {
 				config.batch_process_freq = value;
-			}
-			else {
+			} else {
 				throw std::invalid_argument("batch-process-freq must be >= 1");
 			}
-		}
-		else if (key == "min-ins") {
+		} else if (key == "min-ins") {
 			uint32_t value;
 			if (iss >> value && value >= 1) {
 				config.min_ins = value;
-			}
-			else {
+			} else {
 				throw std::invalid_argument("min-ins must be >= 1");
 			}
-		}
-		else if (key == "max-ins") {
+		} else if (key == "max-ins") {
 			uint32_t value;
 			if (iss >> value && value >= config.min_ins) {
 				config.max_ins = value;
-			}
-			else {
+			} else {
 				throw std::invalid_argument("max-ins must be >= min-ins");
 			}
-		}
-		else if (key == "delay-per-exec") {
+		} else if (key == "delay-per-exec") {
 			uint32_t value;
 			if (iss >> value) {
 				config.delays_per_exec = value;
-			}
-			else {
+			} else {
 				throw std::invalid_argument("Invalid delay-per-exec value");
 			}
-		}
-		else {
+		} else {
 			throw std::invalid_argument("Unknown configuration key: " + key);
 		}
-	}
-	catch (const std::exception& e) {
-		std::cout << "Error: " << e.what() << std::endl;
+	} catch (const std::exception& e) {
+		std::cerr << "Error: " << e.what() << "\n";
 		return false;
 	}
-
 	return true;
 }
 

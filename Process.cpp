@@ -8,7 +8,6 @@
 #include <limits>
 #include "MainConsole.h"
 #include <random>
-#include <chrono> // Include chrono for timestamp
 #include <thread>
 
 Process::Process(const String& processName, const MainConsole::Config& config)
@@ -17,18 +16,22 @@ Process::Process(const String& processName, const MainConsole::Config& config)
     // Get current time
     std::time_t currentTime = std::time(nullptr);
 
-    // Use localtime_s to safely convert time_t to struct tm
+    // Use localtime safely convert time_t to struct tm
+    #ifdef _WIN32
     localtime_s(&processCreationTime, &currentTime);
+    #else
+    localtime_r(&currentTime, &processCreationTime);
+    #endif
 
     processContents = StringVector();       // Initialize the process contents (instructions)
     processCurrentInstructionLine = 0;      // Initialize the current instruction line
-	processTotalInstructions = generateRandomNumber();  // Initialize the total instructions
-	isFinished = false;                     // Initialize the process as not finished
+    processTotalInstructions = generateRandomNumber();  // Initialize the total instructions
+    isFinished = false;                     // Initialize the process as not finished
     isOngoing = false;
 }
 
 void Process::displayProcessInfo() const {
-	displayProcessHeader();
+    displayProcessHeader();
 
     std::cout << "Current Line: " << processCurrentInstructionLine << std::endl;
     std::cout << "Total Instructions: " << processTotalInstructions << std::endl;
@@ -48,7 +51,7 @@ void Process::initProcess() {
 
         // Store the instruction in the processContents vector
         processContents.push_back(instruction);
-		processCurrentInstructionLine += 1;  // Increment the current instruction line
+        processCurrentInstructionLine += 1;  // Increment the current instruction line
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));  // Delay
     }
@@ -69,10 +72,9 @@ void Process::updateProcessInfo() const
 void Process::displayProcessHeader() const
 {
     std::cout << "Process Name: " << processName << std::endl;
-	std::cout << "ID: " << std::hash<String>{}(processName) << std::endl;
+    std::cout << "ID: " << std::hash<String>{}(processName) << std::endl;
     std::cout << "Process Creation Time: " << std::put_time(&processCreationTime, "%c") << std::endl;
     std::cout << "\n";
-
 }
 
 // Remove the const here as it modifies processTotalInstructions
@@ -83,12 +85,12 @@ uint32_t Process::generateRandomNumber()
     std::uniform_int_distribution<uint32_t> dis(config.min_ins, config.max_ins);
 
     // set the processTotalInstructions
-	return dis(gen);
+    return dis(gen);
 }
 
 bool Process::getIsFinished() const
 {
-	return isFinished;
+    return isFinished;
 }
 
 bool Process::getIsOngoing(){

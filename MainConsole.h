@@ -3,9 +3,7 @@
 #include <cstdint>
 #include <mutex>
 
-
-class MainConsole : public AConsole
-{
+class MainConsole : public AConsole {
 public:
 	MainConsole();							// Constructor
 	~MainConsole() = default;				// Destructor
@@ -28,7 +26,6 @@ public:
 	Config getConfig() const;							// Returns the config
 
 private:
-
 	Config config;										// Config variable to hold the values of the config.txt
 	void ASCIITextHeader() const;						// Prints the ASCII text header
 	void displayDevelopers() const;						// Displays the developers of the program
@@ -38,5 +35,4 @@ private:
 	void recognizeCommand(String command) const;		// Recognizes the command
 	bool loadConfigFile(String& filename);				// Loads the config file
 	bool parseConfigFile(String& line);					// Parses the config file
-	
 };

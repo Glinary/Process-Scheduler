@@ -13,7 +13,6 @@
 
 class Scheduler {
 public:
-
     static Scheduler* getInstance();  // Singleton access
     static void initialize(const MainConsole::Config& config);	
 
@@ -21,16 +20,15 @@ public:
     void scheduleProcess(const std::shared_ptr<Process>& process);
     void setBatch(bool status);
     void shutdown(); 
-    
 
 private:
     MainConsole::Config config;
 
-    Scheduler(const MainConsole::Config& config);																// Constructor
-	~Scheduler() = default;
+    Scheduler(const MainConsole::Config& config);         // Constructor
+    ~Scheduler() = default;
     
-    static Scheduler* sched;											
- 
+    static Scheduler* sched;							 // Singleton instance
+     
     void generateBatchProcess(const MainConsole::Config& config, int i); 
     void processThread(int coreID); 
 
@@ -42,11 +40,10 @@ private:
     uint32_t max_ins;					// Maximum instructions: [1, 2^32]
     uint32_t delays_per_exec;			// Delays per execution: [0, 2^32]
     std::unique_ptr<ThreadPool> threadPool;
-    bool isShuttingDown = false;
-    int cycleCounter = 0;                                  // Counter for CPU cycles
-    uint32_t batchProcessFreq;   
+    bool isShuttingDown = false;        // Shutdown flag
+    int cycleCounter = 0;               // Counter for CPU cycles
+    uint32_t batchProcessFreq;          // Batch process frequency   
 
     bool isBatchProcess;
     int nextKey;
-    
 };
