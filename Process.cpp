@@ -48,6 +48,8 @@ void Process::initProcess(int key) {
 
     isOngoing = true;
     while (processCurrentInstructionLine < 50) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
 
         if (config.delays_per_exec == 0) {
             cycle = Scheduler::getInstance()->getCycle();
