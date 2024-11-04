@@ -32,7 +32,7 @@ private:
     std::vector<String> processContents;
     MainConsole::Config config;
     bool isFinished;
-    bool isOngoing;
+    bool isOngoing = false;
     int timeFinished;
 
 	void displayProcessHeader() const;

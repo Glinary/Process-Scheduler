@@ -25,6 +25,7 @@ Process::Process(const String& processName, const MainConsole::Config& config)
     processCurrentInstructionLine = 0;      // Initialize the current instruction line
 	processTotalInstructions = generateRandomNumber();  // Initialize the total instructions
 	isFinished = false;                     // Initialize the process as not finished
+    isOngoing = false;
     coreNum = 0;
     timeFinished = 0;
 }
