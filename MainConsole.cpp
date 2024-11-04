@@ -166,7 +166,7 @@ void MainConsole::process() {
 					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
 
 					if (process->getIsFinished() && !process->getIsOngoing()){
-						std::cout << process->getName() + "   " + std::to_string(process->getTimeFinished()) << std::endl;
+						process->DisplayUpdate();
 
 					}
 				}

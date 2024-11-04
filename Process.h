@@ -21,6 +21,7 @@ public:
     bool getIsOngoing();
     String getName();
     int getTimeFinished();
+    void executeInstruction(int key);
     void setCore(int core);
 
 private:
@@ -34,6 +35,7 @@ private:
     bool isFinished;
     bool isOngoing = false;
     int timeFinished;
+
 
 	void displayProcessHeader() const;
     uint32_t generateRandomNumber();

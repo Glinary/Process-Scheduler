@@ -10,6 +10,7 @@
 #include <random>
 #include <chrono> // Include chrono for timestamp
 #include <thread>
+#include <ctime>
 #include "Scheduler.h"
 
 Process::Process(const String& processName, const MainConsole::Config& config)
@@ -36,10 +37,10 @@ void Process::displayProcessInfo() const {
     std::cout << "Current Line: " << processCurrentInstructionLine << std::endl;
     std::cout << "Total Instructions: " << processTotalInstructions << std::endl;
 
-    // Display all stored instructions
-    for (const auto& instruction : processContents) {
-       std::cout << instruction << std::endl;
-    }
+    // // Display all stored instructions
+    // for (const auto& instruction : processContents) {
+    //    std::cout << instruction << std::endl;
+    // }
 }
 
 void Process::initProcess(int key) {
@@ -48,9 +49,8 @@ void Process::initProcess(int key) {
     int cycle = 0;
 
     isOngoing = true;
-    while (processCurrentInstructionLine < 50) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
+    while (processCurrentInstructionLine < processTotalInstructions) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         if (config.delays_per_exec == 0) {
             cycle = Scheduler::getInstance()->getCycle();
@@ -77,10 +77,43 @@ void Process::initProcess(int key) {
     timeFinished = cycle;
     isFinished = true;
     isOngoing = false; 
+    Scheduler::getInstance()->release_core(coreNum);
 }
 
+void Process::executeInstruction(int key){
+    coreNum = key;
+
+    if (processCurrentInstructionLine == processTotalInstructions){
+        isFinished = true;
+        isOngoing = false;
+    }
+
+    if (!isFinished){
+        isOngoing = true;
+        String instruction = "Instruction #" + std::to_string(processCurrentInstructionLine) + "for " + processName;
+
+        // Store the instruction in the processContents vector
+        processContents.push_back(instruction);
+        processCurrentInstructionLine += 1;
+    }
+
+    std::chrono::microseconds(100);
+ }
+
 void Process::DisplayUpdate() {
-    std::cout << processName + "   " + std::to_string(coreNum)  << std::endl;
+    auto now = std::chrono::system_clock::now();
+    std::time_t nowTime = std::chrono::system_clock::to_time_t(now);
+    // Format the timestamp
+    std::stringstream timestamp;
+    timestamp << std::put_time(std::localtime(&nowTime), "%m/%d/%Y %I:%M:%S%p");
+
+    if (!isFinished){
+        std::cout << processName << "   " << timestamp.str() << "   Core: " 
+              << coreNum << "   " << processCurrentInstructionLine << "/" << processTotalInstructions << std::endl;
+    } else {
+        std::cout << processName << "   " << timestamp.str() << "   Finished!" << "   " << processCurrentInstructionLine << "/" << processTotalInstructions << std::endl;
+    }
+
 }
 
 void Process::updateProcessInfo() const
