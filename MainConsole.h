@@ -1,6 +1,7 @@
 #pragma once
 #include "AConsole.h"
 #include <cstdint>
+#include <mutex>
 
 
 class MainConsole : public AConsole

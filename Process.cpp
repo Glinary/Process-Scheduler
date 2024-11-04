@@ -24,6 +24,7 @@ Process::Process(const String& processName, const MainConsole::Config& config)
     processCurrentInstructionLine = 0;      // Initialize the current instruction line
 	processTotalInstructions = generateRandomNumber();  // Initialize the total instructions
 	isFinished = false;                     // Initialize the process as not finished
+    isOngoing = false;
 }
 
 void Process::displayProcessInfo() const {
@@ -39,6 +40,7 @@ void Process::displayProcessInfo() const {
 }
 
 void Process::initProcess() {
+    isOngoing = true;
     for (int i = 0; i < 50; ++i) {
         std::stringstream ss;
         ss << "Instruction # " << (i + 1) << " for process: " << processName;
@@ -48,9 +50,10 @@ void Process::initProcess() {
         processContents.push_back(instruction);
 		processCurrentInstructionLine += 1;  // Increment the current instruction line
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Delay
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));  // Delay
     }
     isFinished = true;
+    isOngoing = false;
 }
 
 void Process::updateProcessInfo() const
@@ -86,6 +89,10 @@ uint32_t Process::generateRandomNumber()
 bool Process::getIsFinished() const
 {
 	return isFinished;
+}
+
+bool Process::getIsOngoing(){
+    return isOngoing;
 }
 
 String Process::getName() {

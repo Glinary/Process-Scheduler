@@ -19,7 +19,7 @@ public:
 
     void setupScheduler(uint8_t num_cpu, String scheduler, uint32_t quantum_cycles, uint32_t batch_process_freq, uint32_t min_ins, uint32_t max_ins, uint32_t delays_per_exec);
     void scheduleProcess(const std::shared_ptr<Process>& process);
-    void setBatch();
+    void setBatch(bool status);
     void shutdown(); 
     
 
@@ -47,5 +47,6 @@ private:
     uint32_t batchProcessFreq;   
 
     bool isBatchProcess;
+    int nextKey;
     
 };

@@ -16,6 +16,7 @@ public:
 	void displayProcessInfo() const;
     void initProcess();
     bool getIsFinished() const;
+    bool getIsOngoing();
     String getName();
 
 private:
@@ -26,7 +27,7 @@ private:
     std::vector<String> processContents;
     MainConsole::Config config;
     bool isFinished;
-
+    bool isOngoing;
 
     
 	void displayProcessHeader() const;

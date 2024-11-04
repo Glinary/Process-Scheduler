@@ -154,7 +154,7 @@ void MainConsole::process() {
 				for (int i = 0; i < ConsoleManager::getInstance()->getProcesses().size() ; i++){
 					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
 
-					if (!process->getIsFinished()){
+					if (!process->getIsFinished() && process->getIsOngoing()){
 						std::cout << process->getName() << std::endl;
 
 					}
@@ -166,7 +166,7 @@ void MainConsole::process() {
 				for (int i = 0; i < ConsoleManager::getInstance()->getProcesses().size() ; i++){
 					std::shared_ptr<Process> process = ConsoleManager::getInstance()->getProcesses().at(i);
 
-					if (process->getIsFinished()){
+					if (process->getIsFinished()  && !process->getIsOngoing()){
 						std::cout << process->getName() << std::endl;
 
 					}
@@ -179,12 +179,13 @@ void MainConsole::process() {
 				std::cout << "Testing the scheduler...\n";
 				std::cout << "Generating a batch of dummy processes...\n";
 
-				Scheduler::getInstance()->setBatch();
+				Scheduler::getInstance()->setBatch(true);
 
 			}
 			else if (commandMain == "scheduler-stop") {
 				std::cout << "Stopping the scheduler...\n";
 				std::cout << "Stops generating dummy processes...\n";
+				Scheduler::getInstance()->setBatch(false);
 			}
 			else if (commandMain == "report-util") {
 				std::cout << "Generating CPU utilization report. \n";
